@@ -23,9 +23,10 @@ public class PlayerController : MonoBehaviour
     public float jumpableGroundNormalMaxAngle = 45f;
     public bool closeToJumpableGround;
 
-
     public bool isGrounded;
 
+    // Game stats
+    public int health = 1;
 
 
     void Awake()
@@ -100,8 +101,8 @@ public class PlayerController : MonoBehaviour
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
         //Therefore, an additional raycast approach is used to check for close ground
-        if (CharacterCommon.CheckGroundNear(this.transform.position, jumpableGroundNormalMaxAngle, 0.1f, 1f, out closeToJumpableGround))
-            isGrounded = true;
+        /*if (CharacterCommon.CheckGroundNear(this.transform.position, jumpableGroundNormalMaxAngle, 0.1f, 1f, out closeToJumpableGround))
+            isGrounded = true;*/
 
         this.transform.Translate(Vector3.forward * cinput.Forward * Time.deltaTime * forwardMaxSpeed);
         this.transform.Rotate(Vector3.up, cinput.Turn * Time.deltaTime * turnMaxSpeed);
@@ -120,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
         anim.SetFloat("velx", inputTurn); 
         anim.SetFloat("vely", inputForward);
-        anim.SetBool("isFalling", !isGrounded);
+        //anim.SetBool("isFalling", !isGrounded);
 
 
         //clear for next OnCollisionStay() callback
@@ -141,14 +142,25 @@ public class PlayerController : MonoBehaviour
     void OnCollisionEnter(Collision collision)
     {
 
-        if (collision.transform.gameObject.tag == "ground")
+        /*if (collision.transform.gameObject.tag == "ground")
         {
             //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
-        }
+        }*/
 
     }
 
+    // Getter methods
+    // Returns health of the player
+    public int getHealth()
+    {
+        return health;
+    }
 
+    // Returns transform position of the player
+    public Vector3 getPosition()
+    {
+        return this.transform.position;
+    }
 
 
 }
