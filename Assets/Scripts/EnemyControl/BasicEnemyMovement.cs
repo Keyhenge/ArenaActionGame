@@ -21,8 +21,6 @@ public class BasicEnemyMovement : MonoBehaviour
     void Awake()
     {
         // Set up the references.
-        //NEED TO: create nav mesh, once player and enemy health and etc r created add reference
-
         //player = GameObject.FindGameObjectWithTag("Player").transform;
         playerHealth = player.getHealth();
         nav = GetComponent<NavMeshAgent>();
