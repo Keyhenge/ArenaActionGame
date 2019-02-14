@@ -4,16 +4,27 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
+    // Object attributes
+    private Camera cam;
     public GameObject player;
     private Vector3 offset;
-    private float distanceToPlayer;
     public Material mat;
 
+    // Camera movement
+    public float sensitivity = 10f;
+    private float distanceToPlayer;
+    private float curX;
+    private float curY;
+    public float Y_MIN_ANGLE = 10f;
+    public float Y_MAX_ANGLE = 80f;
+
+    // Transparency
     public Material TransparentMaterial = null;
     public float FadeInTimeout = 0.6f;
     public float FadeOutTimeout = 0.2f;
     public float TargetTransparency = 0.3f;
 
+    // Camera Shake
     private float shakeTime = 0f;
     private float shakeAmountInit = 0f;
     private float shakeAmount = 0f;
@@ -38,14 +49,22 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        //obstruction = player.transform;
         offset = transform.position - player.transform.position;
         distanceToPlayer = offset.magnitude;
+        cam = Camera.main;
+        //camTransform = Camera.main.transform;
     }
 
     private void Update()
     {
-        transform.position = player.transform.position + offset;
+        // Camera Movement
+        // Borrowed from https://www.youtube.com/watch?v=Ta7v27yySKs
+        //transform.position = player.transform.position + offset;
+        curX += Input.GetAxis("Mouse X");
+        curY -= Input.GetAxis("Mouse Y");
+        curY = Mathf.Clamp(curY, Y_MIN_ANGLE, Y_MAX_ANGLE);
+
+        // Transparency
         /*// Borrowed from https://answers.unity.com/questions/44815/make-object-transparent-when-between-camera-and-pl.html
         // Makes objects between the camera and player transparent
         RaycastHit[] hits; // you can also use CapsuleCastAll() 
@@ -73,6 +92,7 @@ public class CameraController : MonoBehaviour
             AT.BeTransparent(); // get called every frame to reset the falloff
         }
 
+        // Camera Shake
         originalPos = player.transform.position + offset;
         // Borrowed from https://gist.github.com/ftvs/5822103
         // Shakes camera for a period of time
@@ -92,12 +112,12 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        //addToObstacles();
+        camTransform.position = Vector3.up * 10f + player.transform.position + Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
+        camTransform.LookAt(player.transform.position);
     }
 
     public void shake(float amount)
     {
-        //Debug.Log("Happening 2");
         shakeAmountInit = amount;
         shakeTime = 1f;
     }
@@ -105,5 +125,10 @@ public class CameraController : MonoBehaviour
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         Graphics.Blit(source, destination, mat);
+    }
+
+    public Camera getCamera()
+    {
+        return cam;
     }
 }

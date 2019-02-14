@@ -18,10 +18,7 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem pickup;
     public GameObject jumpTrigger;
     public GameObject cameraObject;
-    private CameraController cam;
-
-    //private Transform leftFoot;
-    //private Transform rightFoot;
+    private Camera cam;
 
     // Object Properties
     public float speed = 1f;
@@ -73,19 +70,13 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
-        //example of how to get access to certain limbs
-        //leftFoot = this.transform.Find("mixamorig:Hips/mixamorig:LeftUpLeg/mixamorig:LeftLeg/mixamorig:LeftFoot");
-        //rightFoot = this.transform.Find("mixamorig:Hips/mixamorig:RightUpLeg/mixamorig:RightLeg/mixamorig:RightFoot");
-
-        /*if (leftFoot == null || rightFoot == null)
-            Debug.Log("One of the feet could not be found");*/
-
         anim.applyRootMotion = false;
 
         isGrounded = false;
 
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
+        cam = Camera.main;
     }
 
 
@@ -137,19 +128,23 @@ public class PlayerController : MonoBehaviour
 
         if (inputMove > 0)
         {
-            this.transform.Translate(Vector3.forward * inputMove * Time.deltaTime * maxSpeed);
+            Vector3 flatCameraRelative = cam.transform.TransformDirection(movement);
+            flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
+            flatCameraRelative.Normalize();
+
+            this.transform.Translate(Vector3.forward * Time.deltaTime * maxSpeed);
             //It's supposed to be safe to not scale with Time.deltaTime (e.g. framerate correction) within FixedUpdate()
             //If you want to make that optimization, you can precompute your velocity-based translation using Time.fixedDeltaTime
             //We use rbody.MovePosition() as it's the most efficient and safest way to directly control position in Unity's Physics
-            rbody.MovePosition(rbody.position + this.transform.forward * inputMove * Time.deltaTime * maxSpeed);
+            rbody.MovePosition(rbody.position + this.transform.forward * Time.deltaTime * maxSpeed);
 
-            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(movement), maxTurnSpeed * Time.deltaTime);
+            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
             //Most characters use capsule colliders constrained to not rotate around X or Z axis
             //However, it's also good to freeze rotation around the Y axis too. This is because friction against walls/corners
             //can turn the character. This errant turn is disorienting to players. 
             //Luckily, we can break the frozen Y axis constraint with rbody.MoveRotation()
             //BTW, quaternions multiplied has the effect of adding the rotations together
-            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(movement), maxTurnSpeed * Time.deltaTime);
+            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
         }
 
 
