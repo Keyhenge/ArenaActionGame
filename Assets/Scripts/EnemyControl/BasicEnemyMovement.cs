@@ -6,17 +6,16 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class BasicEnemyMovement : MonoBehaviour
 {
-    /*
-    Transform player;               // Reference to the player's position.
-    PlayerHealth playerHealth;      // Reference to the player's health.
-    EnemyHealth enemyHealth;        // Reference to this enemy's health.
-    NavMeshAgent nav;               // Reference to the nav mesh agent.
-    */
+    
 
     public PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
     public int enemyHealth = 1;
     private int playerHealth;
+    public Behaviour halo;
+    private GameObject brute;
+  
+    //public Animator anim;
 
     void Awake()
     {
@@ -25,6 +24,7 @@ public class BasicEnemyMovement : MonoBehaviour
         playerHealth = player.getHealth();
         nav = GetComponent<NavMeshAgent>();
         nav.enabled = true;
+        brute = GameObject.FindGameObjectWithTag("brute");
     }
 
     // Update is called once per frame
@@ -36,6 +36,10 @@ public class BasicEnemyMovement : MonoBehaviour
             // ... set the destination of the nav mesh agent to the player.
             //nav.SetDestination(player.getPosition());
             nav.destination = player.getPosition();
+            if (Vector3.Distance(nav.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6)
+            {
+                halo.enabled = true;
+            }
         }
         // Otherwise...
         else
