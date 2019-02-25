@@ -13,39 +13,98 @@ public class BasicEnemyMovement : MonoBehaviour
     public int enemyHealth = 1;
     private int playerHealth;
     public Behaviour halo;
-    private GameObject brute;
+    //public Animator anim;
   
     //public Animator anim;
+    public enum States
+    {
+        Chase,
+        Attack,
+        PDead,
+        Dead
+    };
+    public States state;
 
     void Awake()
     {
-        // Set up the references.
-        //player = GameObject.FindGameObjectWithTag("Player").transform;
         playerHealth = player.getHealth();
         nav = GetComponent<NavMeshAgent>();
         nav.enabled = true;
-        brute = GameObject.FindGameObjectWithTag("brute");
+        state = States.Chase;
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        // If the enemy and the player have health left...
-        if (enemyHealth > 0 && playerHealth > 0)
+        switch(state)
         {
-            // ... set the destination of the nav mesh agent to the player.
-            //nav.SetDestination(player.getPosition());
-            nav.destination = player.getPosition();
-            if (Vector3.Distance(nav.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6)
-            {
-                halo.enabled = true;
-            }
+            case States.Chase:
+                chase_player();
+                halo.enabled = false;
+                if (enemyHealth == 0)
+                {
+                    state = States.Dead;
+                }
+                if (playerHealth == 0)
+                {
+                    state = States.PDead;
+                }
+                if(Vector3.Distance(nav.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6)
+                {
+                    state = States.Attack;
+                }
+                break;
+
+            case States.Attack:
+                if (playerHealth == 0)
+                {
+                    state = States.PDead;
+                } 
+                if (enemyHealth == 0)
+                {
+                    state = States.Dead;
+                }
+                attack();
+                break;
+
+            case States.PDead:
+                halo.enabled = false;
+                nav.enabled = false;
+                //player is dead
+                break;
+
+            case States.Dead:
+                nav.enabled = false;
+                halo.enabled = false;
+                // need to figure out what we want to do when enemy is dead
+                //ie death animation, deletion, etc. 
+                break;
+
+            default:
+                halo.enabled = false;
+                state = States.Chase;
+                break;
         }
-        // Otherwise...
-        else
+
+    }
+
+    private void chase_player()
+    {
+        // need to add anim to movement
+        if (nav.pathPending == false && nav.remainingDistance <= 3)
         {
-            // ... disable the nav mesh agent.
-            nav.enabled = false;
+            nav.ResetPath();
+            nav.SetDestination(player.getPosition());
         }
+        //nav.ResetPath();
+        //nav.SetDestination(player.getPosition());
+        //anim.
+    }
+
+    private void attack()
+    {
+        //add attack funtionality when animation and stuff is done
+        halo.enabled = true;
     }
 }
