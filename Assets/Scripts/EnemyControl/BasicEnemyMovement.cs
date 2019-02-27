@@ -6,8 +6,6 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class BasicEnemyMovement : MonoBehaviour
 {
-    
-
     public PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
     public int enemyHealth = 1;
@@ -31,7 +29,6 @@ public class BasicEnemyMovement : MonoBehaviour
         nav = GetComponent<NavMeshAgent>();
         nav.enabled = true;
         state = States.Chase;
-        
     }
 
     // Update is called once per frame
@@ -45,14 +42,17 @@ public class BasicEnemyMovement : MonoBehaviour
                 if (enemyHealth == 0)
                 {
                     state = States.Dead;
+                    break;
                 }
                 if (playerHealth == 0)
                 {
                     state = States.PDead;
+                    break;
                 }
-                if(Vector3.Distance(nav.transform.position, GameObject.FindGameObjectWithTag("Player").transform.position) <= 6)
+                if(Vector3.Distance(nav.transform.position, player.getPosition()) <= 6)
                 {
                     state = States.Attack;
+                    break;
                 }
                 break;
 
@@ -60,10 +60,12 @@ public class BasicEnemyMovement : MonoBehaviour
                 if (playerHealth == 0)
                 {
                     state = States.PDead;
+                    break;
                 } 
                 if (enemyHealth == 0)
                 {
                     state = States.Dead;
+                    break;
                 }
                 attack();
                 break;
