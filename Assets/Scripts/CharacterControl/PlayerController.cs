@@ -21,16 +21,17 @@ public class PlayerController : MonoBehaviour
     private Camera cam;
 
     // Object Properties
+        // Speed-related
     public float speed = 1f;
     public float maxSpeed = 10f;
     public float maxTurnSpeed = 100f;
+    public float animationSpeed = 1f;
+        // Jump-related
     private bool inAir;
     private float moveHeight;
-
-    // Useful if you implement jump in the future...
-    public float jumpableGroundNormalMaxAngle = 45f;
-    public bool closeToJumpableGround;
-    public bool isGrounded;
+    private bool closeToJumpableGround;
+        // Gun-related
+    private bool aiming;
 
     //Text
     public Text pauseText;
@@ -49,55 +50,60 @@ public class PlayerController : MonoBehaviour
 
     void Awake()
     {
-
         anim = GetComponent<Animator>();
-
         if (anim == null)
             Debug.Log("Animator could not be found");
 
         rbody = GetComponent<Rigidbody>();
-
         if (rbody == null)
             Debug.Log("Rigid body could not be found");
 
         cinput = GetComponent<CharacterInputController>();
-
         if (cinput == null)
             Debug.Log("CharacterInputController could not be found");
-
     }
 
 
     void Start()
     {
         anim.applyRootMotion = false;
-
-        isGrounded = false;
+        inAir = true;
 
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
         cam = Camera.main;
+        anim.speed = animationSpeed;
     }
 
 
     void Update()
     {
+
         // Event-based inputs need to be handled in Update()
-        if (cinput.enabled && cinput.Action)
+        if (cinput.enabled)
         {
             if (cinput.Action)
-                Debug.Log("Action pressed");
+            {
+                Debug.Log("Attack");
+                anim.SetTrigger("attack");
+            }
 
-            anim.SetTrigger("attack");
-            //anim.speed = animationSpeed;
+            if (Input.GetKeyDown(KeyCode.Space) && !inAir)
+            {
+                Debug.Log("Jump");
+                Jump();
+            }
         }
-
-
     }
 
 
     void FixedUpdate()
     {
+        /*if (inAir)
+        {
+            moveHeight = 0;
+        }*/
+
         // Calculate movement vector
         float moveHorizontal = 0f;
         float moveVertical = 0f;
@@ -105,9 +111,18 @@ public class PlayerController : MonoBehaviour
         moveVertical = Input.GetAxis("Vertical");
         Vector2 moveCalc = new Vector2(moveHorizontal, moveVertical);
         moveCalc.Normalize();
+        float xzVel = moveCalc.magnitude;
         Vector3 movement = new Vector3(moveCalc.x, moveHeight, moveCalc.y);
-        float inputMove = movement.magnitude;
-        moveHeight = 0;
+
+
+        anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
+        // If in attack animation, only allow movement on transition back to "Ground"/"Falling"
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+        {
+            movement = new Vector3();
+            xzVel = 0f;
+            moveHeight = 0f;
+        }
 
         /* Allows for shake on jump
         if (rbody.velocity.y * -1 > shakeThreshold)
@@ -123,77 +138,76 @@ public class PlayerController : MonoBehaviour
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
         //Therefore, an additional raycast approach is used to check for close ground
-        if (CharacterCommon.CheckGroundNear(this.transform.position, jumpableGroundNormalMaxAngle, 0.1f, 1f, out closeToJumpableGround))
-            isGrounded = true;
-
-        if (inputMove > 0)
+        if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
         {
-            Vector3 flatCameraRelative = cam.transform.TransformDirection(movement);
-            flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
-            flatCameraRelative.Normalize();
-
-            this.transform.Translate(Vector3.forward * Time.deltaTime * maxSpeed);
-            //It's supposed to be safe to not scale with Time.deltaTime (e.g. framerate correction) within FixedUpdate()
-            //If you want to make that optimization, you can precompute your velocity-based translation using Time.fixedDeltaTime
-            //We use rbody.MovePosition() as it's the most efficient and safest way to directly control position in Unity's Physics
-            rbody.MovePosition(rbody.position + this.transform.forward * Time.deltaTime * maxSpeed);
-
-            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
-            //Most characters use capsule colliders constrained to not rotate around X or Z axis
-            //However, it's also good to freeze rotation around the Y axis too. This is because friction against walls/corners
-            //can turn the character. This errant turn is disorienting to players. 
-            //Luckily, we can break the frozen Y axis constraint with rbody.MoveRotation()
-            //BTW, quaternions multiplied has the effect of adding the rotations together
-            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+            inAir = false;
         }
 
+        // Calculate movement of camera and character independent of camera
+        // Calculate camera position
+        Vector3 flatCameraRelative = cam.transform.TransformDirection(moveCalc);
+        flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
+        flatCameraRelative.Normalize();
 
-        //anim.SetFloat("velx", inputTurn); 
-        //anim.SetFloat("vely", inputForward);
-        //anim.SetBool("isFalling", !isGrounded);
+        // Calculate character translation
+        if (xzVel > 0)
+        {
+            this.transform.Translate(Vector3.forward * Time.deltaTime * maxSpeed);
+            rbody.MovePosition(rbody.position + this.transform.forward * Time.deltaTime * maxSpeed);
+            // Calculate character rotation
+            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+        }
+        if (moveHeight > 0)
+        {
+            //this.transform.Translate(Vector3.up * Time.deltaTime * moveHeight);
+            //rbody.MovePosition(rbody.position + this.transform.up * Time.deltaTime * moveHeight);
+            rbody.AddForce(0, moveHeight, 0, ForceMode.Impulse);
+        }
 
+        anim.SetBool("inAir", inAir);
+        
+        //anim.SetBool("aiming", aiming);
 
         //clear for next OnCollisionStay() callback
-        isGrounded = false;
-
-
+        moveHeight = 0;
+        inAir = true;
     }
+
 
     /* Actions */
     void Jump()
     {
         if (!inAir && Input.GetKeyDown("space"))
         {
-            moveHeight = 30;
+            moveHeight = 70f;
         }
     }
 
-    /* Collisions */
 
-    //This is a physics callback
+    /* Collisions */
+    void OnCollisionEnter(Collision collision)
+    {
+        if (collision.transform.gameObject.tag == "ground")
+        {
+            EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
+        }
+        moveHeight = 0;
+    }
+
     void OnCollisionStay(Collision collision)
     {
-        isGrounded = true;
+        inAir = false;
+        moveHeight = 0;
     }
 
     void OnCollisionExit(Collision collision)
     {
-        isGrounded = false;
+        inAir = true;
     }
 
-    //This is a physics callback
-    void OnCollisionEnter(Collision collision)
-    {
-
-        /*if (collision.transform.gameObject.tag == "ground")
-        {
-            //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
-        }*/
-
-    }
 
     /* Getter methods */
-    
     // Returns health of the player
     public int getHealth()
     {
@@ -206,8 +220,8 @@ public class PlayerController : MonoBehaviour
         return this.transform.position;
     }
 
-    /* Setter methods */
 
+    /* Setter methods */
     // Sets health of the player
     public void setHealth(int h)
     {
