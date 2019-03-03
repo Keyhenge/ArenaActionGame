@@ -10,18 +10,19 @@ using UnityEngine.UI;
 [RequireComponent(typeof(CharacterInputController))]
 public class PlayerController : MonoBehaviour
 {
-    //Attached objects
-    private Rigidbody rbody;
-    private Animator anim;
-    private CharacterInputController cinput;
+    [Header("Attached Objects")]
     public ParticleSystem impact;
     public ParticleSystem pickup;
     public GameObject jumpTrigger;
     public GameObject cameraObject;
+    private Rigidbody rbody;
+    private Animator anim;
+    private CharacterInputController cinput;
     private Camera cam;
 
     // Object Properties
         // Speed-related
+    [Header("Object Properties")]
     public float speed = 1f;
     public float maxSpeed = 10f;
     public float maxTurnSpeed = 100f;
@@ -33,18 +34,18 @@ public class PlayerController : MonoBehaviour
         // Gun-related
     private bool aiming;
 
-    //Text
+    [Header("Text")]
     public Text pauseText;
     public Text winText;
     public Text titleText;
 
-    // Shake
+    [Header("Camera Shake")]
     public float shakeThreshold = 4f;
     public float shakeDecrease = 10f;
     private bool thresholdReached = false;
     private float mostRecentYVel = 0f;
 
-    // Game stats
+    [Header("Game Stats")]
     public int health;
 
 

@@ -4,34 +4,44 @@ using UnityEngine;
 
 public class CameraController : MonoBehaviour
 {
-    // Object attributes
-    private Camera cam;
+    [Header("Object Attributes")]
     public GameObject player;
-    private Vector3 offset;
     public Material mat;
+    private Camera cam;
 
-    // Camera movement
-    public float sensitivity = 10f;
-    private float distanceToPlayer;
+    [Space(10)]
+
+    [Header("Camera Movement")]
+    public float xsen = 1.5f;
+    public float ysen = 1f;
+    public float distanceToPlayer = 20f;
+    private float offset;
+    public float offsetControl = 40f;
+    public float maxDistance = 30f;
+    public float minDistance = -10f;
     private float curX;
     private float curY;
-    public float Y_MIN_ANGLE = 10f;
-    public float Y_MAX_ANGLE = 80f;
+    public float Y_MIN_ANGLE = -25f;
+    public float Y_MAX_ANGLE = 45f;
 
-    // Transparency
+    [Space(10)]
+
+    [Header("Transparency")]
     public Material TransparentMaterial = null;
     public float FadeInTimeout = 0.6f;
     public float FadeOutTimeout = 0.2f;
     public float TargetTransparency = 0.3f;
 
-    // Camera Shake
+    [Space(10)]
+
+    [Header("Camera Shake")]
+    public float shakeDecrease = 2f;
     private float shakeTime = 0f;
     private float shakeAmountInit = 0f;
     private float shakeAmount = 0f;
-    public float shakeDecrease = 2f;
-    Vector3 originalPos;
+    private Vector3 originalPos;
 
-    public Transform camTransform;
+    private Transform camTransform;
 
     //private Transform obstruction;
 
@@ -49,10 +59,8 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        offset = transform.position - player.transform.position;
-        distanceToPlayer = offset.magnitude;
+        offset = 0f;
         cam = Camera.main;
-        //camTransform = Camera.main.transform;
     }
 
     private void Update()
@@ -60,9 +68,11 @@ public class CameraController : MonoBehaviour
         // Camera Movement
         // Borrowed from https://www.youtube.com/watch?v=Ta7v27yySKs
         //transform.position = player.transform.position + offset;
-        curX += Input.GetAxis("Mouse X");
-        curY -= Input.GetAxis("Mouse Y");
+        curX += Input.GetAxis("Mouse X") * xsen;
+        curY -= Input.GetAxis("Mouse Y") * ysen;
         curY = Mathf.Clamp(curY, Y_MIN_ANGLE, Y_MAX_ANGLE);
+        offset = (distanceToPlayer * curY)/offsetControl;
+        offset = Mathf.Clamp(offset, minDistance, maxDistance);
 
         // Transparency
         /*// Borrowed from https://answers.unity.com/questions/44815/make-object-transparent-when-between-camera-and-pl.html
@@ -112,8 +122,8 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        camTransform.position = Vector3.up * 10f + player.transform.position + Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
-        camTransform.LookAt(player.transform.position);
+        camTransform.position = Vector3.up * 5f + player.transform.position + Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer - offset));
+        camTransform.LookAt(Vector3.up * 5f + player.transform.position);
     }
 
     public void shake(float amount)
