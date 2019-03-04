@@ -9,8 +9,6 @@ public class CameraController : MonoBehaviour
     public Material mat;
     private Camera cam;
 
-    [Space(10)]
-
     [Header("Camera Movement")]
     public float xsen = 1.5f;
     public float ysen = 1f;
@@ -24,15 +22,11 @@ public class CameraController : MonoBehaviour
     public float Y_MIN_ANGLE = -25f;
     public float Y_MAX_ANGLE = 45f;
 
-    [Space(10)]
-
     [Header("Transparency")]
     public Material TransparentMaterial = null;
     public float FadeInTimeout = 0.6f;
     public float FadeOutTimeout = 0.2f;
     public float TargetTransparency = 0.3f;
-
-    [Space(10)]
 
     [Header("Camera Shake")]
     public float shakeDecrease = 2f;

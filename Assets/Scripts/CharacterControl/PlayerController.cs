@@ -18,10 +18,15 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rbody;
     private Animator anim;
     private CharacterInputController cinput;
+
+    [Header("Cameras")]
+    public Camera mainCam;
+    public Camera auxCam;
+    public GameObject testObject;
     private Camera cam;
 
     // Object Properties
-        // Speed-related
+    // Speed-related
     [Header("Object Properties")]
     public float speed = 1f;
     public float maxSpeed = 10f;
@@ -72,39 +77,63 @@ public class PlayerController : MonoBehaviour
 
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
-        cam = Camera.main;
+
+        cam = mainCam;
+        //auxCam.enabled = false;
+        //mainCam.enabled = true;
         anim.speed = animationSpeed;
     }
 
 
     void Update()
     {
-
         // Event-based inputs need to be handled in Update()
         if (cinput.enabled)
         {
+            // Attack
             if (cinput.Action)
             {
                 Debug.Log("Attack");
                 anim.SetTrigger("attack");
             }
 
+            // Jump
             if (Input.GetKeyDown(KeyCode.Space) && !inAir)
             {
                 Debug.Log("Jump");
                 Jump();
             }
+
+            // Aim
+            if (Input.GetKey(KeyCode.Mouse1) && !aiming)
+            {
+                Debug.Log("Aim");
+                aiming = true;
+            }
+            if (!(Input.GetKey(KeyCode.Mouse1)) && aiming)
+            {
+                Debug.Log("Stop aiming");
+                aiming = false;
+            }
+
+            anim.SetBool("aiming", aiming);
         }
+
+        // Switch between first-person and third-person
+        /*if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+        {
+            auxCam.enabled = true;
+            mainCam.enabled = false;
+        } else
+        {
+            auxCam.enabled = false;
+            mainCam.enabled = true;
+        }*/
     }
 
 
     void FixedUpdate()
     {
-        /*if (inAir)
-        {
-            moveHeight = 0;
-        }*/
-
         // Calculate movement vector
         float moveHorizontal = 0f;
         float moveVertical = 0f;
@@ -114,6 +143,7 @@ public class PlayerController : MonoBehaviour
         moveCalc.Normalize();
         float xzVel = moveCalc.magnitude;
         Vector3 movement = new Vector3(moveCalc.x, moveHeight, moveCalc.y);
+        Vector3 movementXZ = new Vector3(moveCalc.x, 0, moveCalc.y);
 
 
         anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
@@ -124,6 +154,14 @@ public class PlayerController : MonoBehaviour
             xzVel = 0f;
             moveHeight = 0f;
         }
+
+        // TEMP CHANGE LATER
+        /*if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+        {
+            movement = new Vector3();
+            xzVel = 0f;
+            moveHeight = 0f;
+        }*/
 
         /* Allows for shake on jump
         if (rbody.velocity.y * -1 > shakeThreshold)
@@ -145,10 +183,14 @@ public class PlayerController : MonoBehaviour
         }
 
         // Calculate movement of camera and character independent of camera
-        // Calculate camera position
-        Vector3 flatCameraRelative = cam.transform.TransformDirection(moveCalc);
+        // Calculate camera position on flat plane
+        Vector3 flatCameraRelative = cam.transform.TransformDirection(movementXZ);
         flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
         flatCameraRelative.Normalize();
+        /*Vector3 flatCameraRelative = new Vector3(cam.transform.position.x - this.transform.position.x, 0, cam.transform.position.z - this.transform.position.z);
+        Vector3 flatCameraVisual = new Vector3(cam.transform.position.x - this.transform.position.x, this.transform.position.y + 5f, cam.transform.position.z - this.transform.position.z);
+        flatCameraRelative.Normalize();*/
+        testObject.transform.position = flatCameraRelative * 2 + this.transform.position;
 
         // Calculate character translation
         if (xzVel > 0)
