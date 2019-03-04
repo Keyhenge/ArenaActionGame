@@ -8,7 +8,7 @@ public class BasicEnemyMovement : MonoBehaviour
 {
     public PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
-    public int enemyHealth = 1;
+    public int enemyHealth = 10;
     private int playerHealth;
     public Behaviour halo;
     //public Animator anim;
@@ -108,5 +108,21 @@ public class BasicEnemyMovement : MonoBehaviour
     {
         //add attack funtionality when animation and stuff is done
         halo.enabled = true;
+    }
+
+    /* Health-related methods */
+    public int getHealth()
+    {
+        return enemyHealth;
+    }
+
+    public void hit()
+    {
+        enemyHealth -= 1;
+
+        if (enemyHealth <= 0)
+        {
+            Destroy(this.gameObject);
+        }
     }
 }

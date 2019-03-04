@@ -11,48 +11,45 @@ using UnityEngine.UI;
 public class PlayerController : MonoBehaviour
 {
     [Header("Attached Objects")]
-    public ParticleSystem impact;
-    public ParticleSystem pickup;
-    public GameObject jumpTrigger;
-    public GameObject cameraObject;
-    private Rigidbody rbody;
-    private Animator anim;
-    private CharacterInputController cinput;
+    public ParticleSystem impact;               // Particle system for hitting the floor
+    public ParticleSystem pickup;               // Particle system for picking up item         
+    private Rigidbody rbody;                    // Rigidbody reference
+    private Animator anim;                      // Animator reference
+    private CharacterInputController cinput;    // Input reference
 
     [Header("Cameras")]
-    public Camera mainCam;
-    public Camera auxCam;
-    public GameObject auxCamTarget;
-    public GameObject testObject;
-    private Camera cam;
+    public Camera mainCam;                      // Main third-person camera
+    public Camera auxCam;                       // Auxillary first-person camera
+    public GameObject auxCamTarget;             // Target for auxillary first-person camera
+    public GameObject testObject;               // Test object for character rotation issues                     
 
     // Object Properties
-    // Speed-related
+        // Speed-related
     [Header("Object Properties")]
-    public float speed = 1f;
-    public float maxSpeed = 10f;
-    public float maxTurnSpeed = 100f;
-    public float animationSpeed = 1f;
+    public float maxSpeed = 10f;                // Max translation speed of character
+    public float maxTurnSpeed = 100f;           // Max rotation speed of character
+    public float animationSpeed = 1f;           // Animation speed multiplier
         // Jump-related
-    private bool inAir;
-    private float moveHeight;
-    private bool closeToJumpableGround;
+    private bool inAir;                         // Whether character is in air (true) or on ground (false)
+    private float moveHeight;                   // Upward force on character
+    private bool closeToJumpableGround;         // Whether character is close to ground or not
         // Gun-related
-    private bool aiming;
+    private bool aiming;                        // Whether character is aiming
+        // Animation-related
+    private bool changedState;                  // Whether character has changed state since last hit
 
-    [Header("Text")]
+    // Reserved sections for future updates
+    /*[Header("Text")]
     public Text pauseText;
-    public Text winText;
-    public Text titleText;
 
     [Header("Camera Shake")]
     public float shakeThreshold = 4f;
     public float shakeDecrease = 10f;
     private bool thresholdReached = false;
-    private float mostRecentYVel = 0f;
+    private float mostRecentYVel = 0f;*/
 
     [Header("Game Stats")]
-    public int health;
+    public int health;                          // Remaining health
 
 
     void Awake()
@@ -79,10 +76,10 @@ public class PlayerController : MonoBehaviour
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
 
-        cam = mainCam;
-        //auxCam.enabled = false;
-        //mainCam.enabled = true;
+        auxCam.enabled = false;
+        mainCam.enabled = true;
         anim.speed = animationSpeed;
+        changedState = true;
     }
 
 
@@ -92,10 +89,20 @@ public class PlayerController : MonoBehaviour
         if (cinput.enabled)
         {
             // Attack
-            if (cinput.Action)
+            if (cinput.Action && (anim.GetCurrentAnimatorStateInfo(0).IsName("Ground") || anim.GetCurrentAnimatorStateInfo(0).IsName("Falling") || anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe Recovery")))
             {
                 Debug.Log("Attack");
                 anim.SetTrigger("attack");
+            }
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
+            {
+                //Debug.Log("Air swiped");
+                anim.SetBool("airAttack", false);
+            }
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+            {
+                //Debug.Log("Swiped");
+                anim.ResetTrigger("attack");
             }
 
             // Jump
@@ -115,6 +122,12 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Stop aiming");
                 aiming = false;
+            }
+
+            // Attack recovery
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe Recovery") || anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe Recovery"))
+            {
+                changedState = true;
             }
 
             anim.SetBool("aiming", aiming);
@@ -174,6 +187,7 @@ public class PlayerController : MonoBehaviour
         if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
         {
             inAir = false;
+            anim.SetBool("airAttack", true);
         }
 
         // Calculate character translation
@@ -181,7 +195,7 @@ public class PlayerController : MonoBehaviour
         {
             // Calculate movement of camera and character independent of camera
             // Calculate camera position on flat plane
-            Vector3 flatCameraRelative = cam.transform.TransformDirection(movementXZ);
+            Vector3 flatCameraRelative = mainCam.transform.TransformDirection(movementXZ);
             flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
             flatCameraRelative.Normalize();
             if (testObject.active)
@@ -225,7 +239,7 @@ public class PlayerController : MonoBehaviour
     {
         if (!inAir && Input.GetKeyDown("space"))
         {
-            moveHeight = 70f;
+            moveHeight = 60f;
         }
     }
 
@@ -235,20 +249,42 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.transform.gameObject.tag == "ground")
         {
-            EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
+            //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
         }
         moveHeight = 0;
     }
-
     void OnCollisionStay(Collision collision)
     {
         inAir = false;
         moveHeight = 0;
     }
-
     void OnCollisionExit(Collision collision)
     {
         inAir = true;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        // Hit Brute head
+        if (other.transform.gameObject.name == "Head" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
+        {
+            Debug.Log("Hit Brute");
+            // Do a bounce if airborne hit
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
+            {
+                rbody.velocity = Vector3.zero;
+                rbody.angularVelocity = Vector3.zero;
+                moveHeight = 35f;
+            }
+
+            // Head -> pSphere11 -> Brute
+            other.transform.gameObject.
+                transform.parent.gameObject.
+                transform.parent.gameObject.
+                GetComponent<BasicEnemyMovement>().hit();
+
+            changedState = false;
+        }
     }
 
 
