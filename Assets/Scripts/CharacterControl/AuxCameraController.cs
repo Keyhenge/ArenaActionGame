@@ -2,22 +2,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-public class CameraController : MonoBehaviour
+public class AuxCameraController : MonoBehaviour
 {
     [Header("Object Attributes")]
     public GameObject player;
     public Material mat;
-    private Camera cam;
+    private Animator playerAnimator;
 
     [Header("Camera Movement")]
     public float xsen = 1.5f;
     public float ysen = 1f;
-    public float distanceToPlayer = 20f;
-    private float offset;
-    public float offsetControl = 40f;
-    public float maxDistance = 30f;
-    public float minDistance = -10f;
+    public float distanceToPlayer = 3f;
     private float curX;
     private float curY;
     public float Y_MIN_ANGLE = -25f;
@@ -54,22 +49,16 @@ public class CameraController : MonoBehaviour
     // Start is called before the first frame update
     private void Start()
     {
-        offset = 0f;
-        cam = GetComponent<Camera>();
-        if (cam == null)
-            Debug.Log("Camera could not be found");
+        playerAnimator = player.GetComponent<Animator>();
     }
 
     private void Update()
     {
         // Camera Movement
         // Borrowed from https://www.youtube.com/watch?v=Ta7v27yySKs
-        //transform.position = player.transform.position + offset;
         curX += Input.GetAxis("Mouse X") * xsen;
         curY -= Input.GetAxis("Mouse Y") * ysen;
         curY = Mathf.Clamp(curY, Y_MIN_ANGLE, Y_MAX_ANGLE);
-        offset = (distanceToPlayer * curY)/offsetControl;
-        offset = Mathf.Clamp(offset, minDistance, maxDistance);
 
         // Transparency
         /*// Borrowed from https://answers.unity.com/questions/44815/make-object-transparent-when-between-camera-and-pl.html
@@ -119,8 +108,8 @@ public class CameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        camTransform.position = Vector3.up * 5f + player.transform.position + Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer - offset));
-        camTransform.LookAt(Vector3.up * 5f + player.transform.position);
+        camTransform.position = Vector3.up * 5f + player.transform.position - Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
+        playerAnimator.SetFloat("cameraAngle", curY);
     }
 
     public void shake(float amount)
@@ -132,10 +121,5 @@ public class CameraController : MonoBehaviour
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         Graphics.Blit(source, destination, mat);
-    }
-
-    public Camera getCamera()
-    {
-        return cam;
     }
 }

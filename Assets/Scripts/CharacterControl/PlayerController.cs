@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
     [Header("Cameras")]
     public Camera mainCam;
     public Camera auxCam;
+    public GameObject auxCamTarget;
     public GameObject testObject;
     private Camera cam;
 
@@ -120,15 +121,16 @@ public class PlayerController : MonoBehaviour
         }
 
         // Switch between first-person and third-person
-        /*if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
         {
             auxCam.enabled = true;
             mainCam.enabled = false;
-        } else
+        }
+        else
         {
             auxCam.enabled = false;
             mainCam.enabled = true;
-        }*/
+        }
     }
 
 
@@ -148,20 +150,12 @@ public class PlayerController : MonoBehaviour
 
         anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
         // If in attack animation, only allow movement on transition back to "Ground"/"Falling"
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle")))
         {
             movement = new Vector3();
             xzVel = 0f;
             moveHeight = 0f;
         }
-
-        // TEMP CHANGE LATER
-        /*if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
-        {
-            movement = new Vector3();
-            xzVel = 0f;
-            moveHeight = 0f;
-        }*/
 
         /* Allows for shake on jump
         if (rbody.velocity.y * -1 > shakeThreshold)
@@ -182,24 +176,32 @@ public class PlayerController : MonoBehaviour
             inAir = false;
         }
 
-        // Calculate movement of camera and character independent of camera
-        // Calculate camera position on flat plane
-        Vector3 flatCameraRelative = cam.transform.TransformDirection(movementXZ);
-        flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
-        flatCameraRelative.Normalize();
-        /*Vector3 flatCameraRelative = new Vector3(cam.transform.position.x - this.transform.position.x, 0, cam.transform.position.z - this.transform.position.z);
-        Vector3 flatCameraVisual = new Vector3(cam.transform.position.x - this.transform.position.x, this.transform.position.y + 5f, cam.transform.position.z - this.transform.position.z);
-        flatCameraRelative.Normalize();*/
-        testObject.transform.position = flatCameraRelative * 2 + this.transform.position;
-
         // Calculate character translation
         if (xzVel > 0)
         {
+            // Calculate movement of camera and character independent of camera
+            // Calculate camera position on flat plane
+            Vector3 flatCameraRelative = cam.transform.TransformDirection(movementXZ);
+            flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
+            flatCameraRelative.Normalize();
+            if (testObject.active)
+            {
+                testObject.transform.position = flatCameraRelative * 2 + this.transform.position;
+            }
+
             this.transform.Translate(Vector3.forward * Time.deltaTime * maxSpeed);
             rbody.MovePosition(rbody.position + this.transform.forward * Time.deltaTime * maxSpeed);
             // Calculate character rotation
             this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
             rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+        }
+        else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+        {
+            Vector3 rotateTarget = new Vector3(auxCamTarget.transform.position.x - this.transform.position.x, 0, auxCamTarget.transform.position.z - this.transform.position.z);
+
+            // Calculate character/camera rotation
+            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
+            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
         }
         if (moveHeight > 0)
         {
@@ -261,6 +263,12 @@ public class PlayerController : MonoBehaviour
     public Vector3 getPosition()
     {
         return this.transform.position;
+    }
+
+    // Returns transform position of the player
+    public Animator getAnimator()
+    {
+        return anim;
     }
 
 
