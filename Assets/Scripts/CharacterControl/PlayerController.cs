@@ -12,7 +12,8 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Attached Objects")]
     public ParticleSystem impact;               // Particle system for hitting the floor
-    public ParticleSystem pickup;               // Particle system for picking up item         
+    public ParticleSystem pickup;               // Particle system for picking up item       
+    public EnemySpawner spawner;
     private Rigidbody rbody;                    // Rigidbody reference
     private Animator anim;                      // Animator reference
     private CharacterInputController cinput;    // Input reference 
@@ -31,8 +32,8 @@ public class PlayerController : MonoBehaviour
     // Jump-related
         public float jumpHeight = 40f;          // Force applied to character when jumping off of ground
         public float bounceHeight = 20f;        // Force applied to character when hitting enemy
-        public bool inAir;                      // Whether character is in air (true) or on ground (false)
-        public bool jumping;                   // Whether character has initiated a jump (reset on full transition to jumping animation state)
+        private bool inAir;                      // Whether character is in air (true) or on ground (false)
+        private bool jumping;                   // Whether character has initiated a jump (reset on full transition to jumping animation state)
         private float moveHeight;               // Upward force on character
         private bool closeToJumpableGround;     // Whether character is close to ground or not
     // Gun-related
@@ -40,7 +41,7 @@ public class PlayerController : MonoBehaviour
     // Animation-related
         private bool changedState;              // Whether character has changed state since last hit
     // Attack-related
-        public bool airAttack;
+        private bool airAttack;
 
     // Reserved sections for future updates
     [Header("UI")]
@@ -343,6 +344,7 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("Killed Brute");
                 score++;
                 scoreText.text = "Score: " + score.ToString();
+                spawner.KilledEnemy();
             }
             brute.hit();
 
