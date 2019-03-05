@@ -51,15 +51,16 @@ public class PlayerController : MonoBehaviour
     public Text scoreText;
     private int score = 0;
 
-    /*[Header("Camera Shake")]
+    [Header("Camera Shake")]
     public float shakeGroundAttack = 10f;
     public float shakeAirAttack = 15f;
+    public float shakeDamage = 5f;
     public float shakeDecrease = 10f;
-    private bool thresholdReached = false;
-    private float mostRecentYVel = 0f;*/
 
     [Header("Game Stats")]
+    public int maxHealth = 2;                   // Max health
     public int health;                          // Remaining health
+    public int ammo;                            // Remaining ammo
 
 
     void Awake()
@@ -85,7 +86,7 @@ public class PlayerController : MonoBehaviour
 
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
-        health = 1;
+        health = maxHealth;
 
         auxCam.enabled = false;
         mainCam.enabled = true;
@@ -101,6 +102,9 @@ public class PlayerController : MonoBehaviour
             deathScreen.playerDied = true;
         }
 
+        //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
+        //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
+        //Therefore, an additional raycast approach is used to check for close ground
         if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
         {
             inAir = false;
@@ -118,12 +122,12 @@ public class PlayerController : MonoBehaviour
             // Attack
             if (cinput.Action && anim.GetCurrentAnimatorStateInfo(0).IsName("Ground"))
             {
-                Debug.Log("Attack");
+                Debug.Log("Player: Attack");
                 anim.SetTrigger("attack");
             }
             if (cinput.Action && airAttack && (jumping || inAir))
             {
-                Debug.Log("Air Attack");
+                Debug.Log("Player: Air Attack");
                 airAttack = false;
                 anim.SetTrigger("attack");
             }
@@ -141,7 +145,7 @@ public class PlayerController : MonoBehaviour
             // Jump
             if (Input.GetKeyDown(KeyCode.Space) && !inAir)
             {
-                Debug.Log("Jump");
+                Debug.Log("Player: Jump");
                 jumping = true;
                 Jump();
             }
@@ -153,12 +157,12 @@ public class PlayerController : MonoBehaviour
             // Aim
             if (Input.GetKey(KeyCode.Mouse1) && !aiming)
             {
-                Debug.Log("Aim");
+                Debug.Log("Player: Aim");
                 aiming = true;
             }
             if (!(Input.GetKey(KeyCode.Mouse1)) && aiming)
             {
-                Debug.Log("Stop aiming");
+                Debug.Log("Player: Stop aiming");
                 aiming = false;
             }
 
@@ -230,16 +234,6 @@ public class PlayerController : MonoBehaviour
         }
         mostRecentYVel = rbody.velocity.y;*/
 
-        //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
-        //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
-        //Therefore, an additional raycast approach is used to check for close ground
-        /*if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
-        {
-            inAir = false;
-            airAttack = true;
-            anim.SetBool("airAttack", true);
-        }*/
-
         // Calculate character translation
         if (xzVel > 0)
         {
@@ -258,12 +252,10 @@ public class PlayerController : MonoBehaviour
             Vector3 xzVelVector = new Vector3(rbody.velocity.x, 0, rbody.velocity.z);
             if (xzVelVector.magnitude > maxSpeed)
             {
-                //testObject.transform.localPosition = (xzVelVector / xzVelVector.magnitude * maxSpeed) - xzVelVector;
                 rbody.AddForce((xzVelVector/xzVelVector.magnitude * maxSpeed) - xzVelVector * 8f);
             }
 
             // Calculate character rotation
-            //this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
             rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
             if (inAir)
             {
@@ -275,19 +267,14 @@ public class PlayerController : MonoBehaviour
             Vector3 rotateTarget = new Vector3(auxCamTarget.transform.position.x - this.transform.position.x, 0, auxCamTarget.transform.position.z - this.transform.position.z);
 
             // Calculate character/camera rotation
-            //this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
             rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
         }
         if (moveHeight > 0)
         {
-            //this.transform.Translate(Vector3.up * Time.deltaTime * moveHeight);
-            //rbody.MovePosition(rbody.position + this.transform.up * Time.deltaTime * moveHeight);
             rbody.AddForce(0, moveHeight, 0, ForceMode.Impulse);
         }
 
         anim.SetBool("inAir", inAir);
-        
-        //anim.SetBool("aiming", aiming);
 
         //clear for next OnCollisionStay() callback
         moveHeight = 0;
@@ -313,9 +300,9 @@ public class PlayerController : MonoBehaviour
             //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
             inAir = false;
             moveHeight = 0;
-        } else
+        } else if (collision.transform.gameObject.tag == "enemy")
         {
-            Debug.Log("Contact Damage");
+            Debug.Log("Player: Contact Damage");
             health -= 1;
             Bounce(collision, 5f, 1000f);
         }
@@ -338,7 +325,7 @@ public class PlayerController : MonoBehaviour
         // Hit Brute head
         if (other.transform.gameObject.name == "Head" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
         {
-            Debug.Log("Hit Brute");
+            Debug.Log("Player: Hit Brute");
             // Do a bounce if airborne hit
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
             {
@@ -355,7 +342,7 @@ public class PlayerController : MonoBehaviour
                 GetComponent<BasicEnemyMovement>();
             if (brute.getHealth() == 1)
             {
-                Debug.Log("Killed Brute");
+                Debug.Log("Player: Killed Brute");
                 score++;
                 scoreText.text = "Score: " + score.ToString();
                 spawner.KilledEnemy();
