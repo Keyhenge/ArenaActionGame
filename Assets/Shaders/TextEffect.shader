@@ -93,16 +93,7 @@ Shader "Custom/TextEffect"
                 UNITY_SETUP_INSTANCE_ID(v);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
 
-				float4 offset = float4(
-					tex2Dlod(_NoiseTex, float4(0, v.vertex.y / 100 + _Time[1]/50, 0, 0)).r,
-					tex2Dlod(_NoiseTex, float4( v.vertex.x / 100 + _Time[1] / 50, 0, 0, 0)).r,
-					0,
-					0
-				);
-
-				offset -= 0.5;
-
-                OUT.worldPosition = v.vertex + offset*20;
+                OUT.worldPosition = v.vertex;
                 OUT.vertex = UnityObjectToClipPos(OUT.worldPosition);
 
                 OUT.texcoord = TRANSFORM_TEX(v.texcoord, _MainTex);
@@ -116,15 +107,9 @@ Shader "Custom/TextEffect"
 
             fixed4 frag(v2f IN) : SV_Target
             {
-				float2 offset = float2(
-					tex2D(_NoiseTex, float2(IN.worldPosition.x / _DistortionSpreader, _Time[1]) ).r,
-					tex2D(_NoiseTex, float2(_Time[1], IN.worldPosition.y / _DistortionSpreader)).r
-				);
-
-				offset -= 0.5;
-
                 half4 color = (tex2D(_MainTex, IN.texcoord) + _TextureSampleAdd) * IN.color;
-				//color.r = 0.7;
+				color.g = sin(_Time[2])/2 + 0.5;
+				color.b = sin(_Time[2])/2 + 0.5;
 
                 #ifdef UNITY_UI_CLIP_RECT
                 color.a *= UnityGet2DClipping(IN.worldPosition.xy, _ClipRect);
