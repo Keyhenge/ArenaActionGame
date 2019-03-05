@@ -7,6 +7,7 @@ public class PauseMenuController : MonoBehaviour
 {
     public string mainMenuScene;
     public GameObject pauseMenu;
+    public GameObject deathMenu;
     public bool isPaused;
 
     // Start is called before the first frame update
@@ -18,7 +19,7 @@ public class PauseMenuController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && !deathMenu.active)
         {
             if(isPaused)
             {

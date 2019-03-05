@@ -15,7 +15,7 @@ public class PlayerController : MonoBehaviour
     public ParticleSystem pickup;               // Particle system for picking up item         
     private Rigidbody rbody;                    // Rigidbody reference
     private Animator anim;                      // Animator reference
-    private CharacterInputController cinput;    // Input reference
+    private CharacterInputController cinput;    // Input reference 
 
     [Header("Cameras")]
     public Camera mainCam;                      // Main third-person camera
@@ -23,26 +23,32 @@ public class PlayerController : MonoBehaviour
     public GameObject auxCamTarget;             // Target for auxillary first-person camera
     public GameObject testObject;               // Test object for character rotation issues                     
 
-    // Object Properties
-        // Speed-related
     [Header("Object Properties")]
-    public float maxSpeed = 10f;                // Max translation speed of character
-    public float maxTurnSpeed = 100f;           // Max rotation speed of character
-    public float animationSpeed = 1f;           // Animation speed multiplier
-        // Jump-related
-    private bool inAir;                         // Whether character is in air (true) or on ground (false)
-    private float moveHeight;                   // Upward force on character
-    private bool closeToJumpableGround;         // Whether character is close to ground or not
-        // Gun-related
-    private bool aiming;                        // Whether character is aiming
-        // Animation-related
-    private bool changedState;                  // Whether character has changed state since last hit
+    // Speed-related
+        public float maxSpeed = 10f;            // Max translation speed of character
+        public float maxTurnSpeed = 100f;       // Max rotation speed of character
+        public float animationSpeed = 1f;       // Animation speed multiplier
+    // Jump-related
+        public float jumpHeight = 40f;          // Force applied to character when jumping off of ground
+        public float bounceHeight = 20f;        // Force applied to character when hitting enemy
+        public bool inAir;                      // Whether character is in air (true) or on ground (false)
+        public bool jumping;                   // Whether character has initiated a jump (reset on full transition to jumping animation state)
+        private float moveHeight;               // Upward force on character
+        private bool closeToJumpableGround;     // Whether character is close to ground or not
+    // Gun-related
+        private bool aiming;                    // Whether character is aiming
+    // Animation-related
+        private bool changedState;              // Whether character has changed state since last hit
+    // Attack-related
+        public bool airAttack;
 
     // Reserved sections for future updates
-    /*[Header("Text")]
-    public Text pauseText;
+    [Header("UI")]
+    public DeathMenuController deathScreen;
+    public Text scoreText;
+    private int score = 0;
 
-    [Header("Camera Shake")]
+    /*[Header("Camera Shake")]
     public float shakeThreshold = 4f;
     public float shakeDecrease = 10f;
     private bool thresholdReached = false;
@@ -75,6 +81,7 @@ public class PlayerController : MonoBehaviour
 
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
+        health = 1;
 
         auxCam.enabled = false;
         mainCam.enabled = true;
@@ -85,19 +92,41 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (health <= 0)
+        {
+            deathScreen.playerDied = true;
+        }
+
+        if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
+        {
+            inAir = false;
+            airAttack = true;
+            anim.SetBool("airAttack", true);
+        }
+        else
+        {
+            inAir = true;
+        }
+
         // Event-based inputs need to be handled in Update()
         if (cinput.enabled)
         {
             // Attack
-            if (cinput.Action && (anim.GetCurrentAnimatorStateInfo(0).IsName("Ground") || anim.GetCurrentAnimatorStateInfo(0).IsName("Falling") || anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe Recovery")))
+            if (cinput.Action && anim.GetCurrentAnimatorStateInfo(0).IsName("Ground"))
             {
                 Debug.Log("Attack");
+                anim.SetTrigger("attack");
+            }
+            if (cinput.Action && airAttack && (jumping || inAir))
+            {
+                Debug.Log("Air Attack");
+                airAttack = false;
                 anim.SetTrigger("attack");
             }
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
             {
                 //Debug.Log("Air swiped");
-                anim.SetBool("airAttack", false);
+                anim.SetBool("airAttack", airAttack);
             }
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
             {
@@ -109,7 +138,12 @@ public class PlayerController : MonoBehaviour
             if (Input.GetKeyDown(KeyCode.Space) && !inAir)
             {
                 Debug.Log("Jump");
+                jumping = true;
                 Jump();
+            }
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Falling"))
+            {
+                jumping = false;
             }
 
             // Aim
@@ -184,11 +218,12 @@ public class PlayerController : MonoBehaviour
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
         //Therefore, an additional raycast approach is used to check for close ground
-        if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
+        /*if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
         {
             inAir = false;
+            airAttack = true;
             anim.SetBool("airAttack", true);
-        }
+        }*/
 
         // Calculate character translation
         if (xzVel > 0)
@@ -203,18 +238,29 @@ public class PlayerController : MonoBehaviour
                 testObject.transform.position = flatCameraRelative * 2 + this.transform.position;
             }
 
-            this.transform.Translate(Vector3.forward * Time.deltaTime * maxSpeed);
-            rbody.MovePosition(rbody.position + this.transform.forward * Time.deltaTime * maxSpeed);
+            //this.transform.Translate(Vector3.forward * Time.deltaTime * maxSpeed);
+            rbody.AddForce(this.transform.forward * Time.deltaTime * maxSpeed * 500f);
+            Vector3 xzVelVector = new Vector3(rbody.velocity.x, 0, rbody.velocity.z);
+            if (xzVelVector.magnitude > maxSpeed)
+            {
+                //testObject.transform.localPosition = (xzVelVector / xzVelVector.magnitude * maxSpeed) - xzVelVector;
+                rbody.AddForce((xzVelVector/xzVelVector.magnitude * maxSpeed) - xzVelVector * 8f);
+            }
+
             // Calculate character rotation
-            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+            //this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
             rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+            if (inAir)
+            {
+                rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+            }
         }
         else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
         {
             Vector3 rotateTarget = new Vector3(auxCamTarget.transform.position.x - this.transform.position.x, 0, auxCamTarget.transform.position.z - this.transform.position.z);
 
             // Calculate character/camera rotation
-            this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
+            //this.transform.rotation = Quaternion.RotateTowards(this.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
             rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(rotateTarget), maxTurnSpeed * Time.deltaTime);
         }
         if (moveHeight > 0)
@@ -239,26 +285,35 @@ public class PlayerController : MonoBehaviour
     {
         if (!inAir && Input.GetKeyDown("space"))
         {
-            moveHeight = 60f;
+            moveHeight = jumpHeight;
         }
     }
 
 
     /* Collisions */
-    void OnCollisionEnter(Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.gameObject.tag == "ground")
         {
             //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
+            inAir = false;
+            moveHeight = 0;
+        } else
+        {
+            Debug.Log("Contact Damage");
+            health -= 1;
+            Bounce(collision, 5f, 1000f);
         }
-        moveHeight = 0;
     }
-    void OnCollisionStay(Collision collision)
+    private void OnCollisionStay(Collision collision)
     {
-        inAir = false;
-        moveHeight = 0;
+        if (collision.transform.gameObject.tag == "ground")
+        {
+            inAir = false;
+            moveHeight = 0;
+        }
     }
-    void OnCollisionExit(Collision collision)
+    private void OnCollisionExit(Collision collision)
     {
         inAir = true;
     }
@@ -272,19 +327,42 @@ public class PlayerController : MonoBehaviour
             // Do a bounce if airborne hit
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
             {
-                rbody.velocity = Vector3.zero;
-                rbody.angularVelocity = Vector3.zero;
-                moveHeight = 35f;
+                //rbody.velocity = Vector3.zero;
+                //rbody.angularVelocity = Vector3.zero;
+                moveHeight = bounceHeight;
+                Bounce(other, 15f, 1000f);
             }
 
             // Head -> pSphere11 -> Brute
-            other.transform.gameObject.
+            BasicEnemyMovement brute = other.transform.gameObject.
                 transform.parent.gameObject.
                 transform.parent.gameObject.
-                GetComponent<BasicEnemyMovement>().hit();
+                GetComponent<BasicEnemyMovement>();
+            if (brute.getHealth() == 1)
+            {
+                Debug.Log("Killed Brute");
+                score++;
+                scoreText.text = "Score: " + score.ToString();
+            }
+            brute.hit();
 
             changedState = false;
         }
+    }
+
+    private void Bounce(Collision col, float xzMult, float force)
+    {
+        Vector3 dir = this.transform.position - col.gameObject.transform.position;
+        dir = dir.normalized;
+        dir = new Vector3(dir.x * xzMult, dir.y, dir.z * xzMult);
+        rbody.AddForce(dir.normalized * force);
+    }
+    private void Bounce(Collider col, float xzMult, float force)
+    {
+        Vector3 dir = this.transform.position - col.gameObject.transform.position;
+        dir = dir.normalized;
+        dir = new Vector3(dir.x * xzMult, dir.y, dir.z * xzMult);
+        rbody.AddForce(dir.normalized * force);
     }
 
 
@@ -316,7 +394,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // Sets transform position of the player
-    public void getPosition(Vector3 v)
+    public void setPosition(Vector3 v)
     {
         this.transform.position = v;
     }
