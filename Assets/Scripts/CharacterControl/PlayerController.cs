@@ -32,7 +32,7 @@ public class PlayerController : MonoBehaviour
     // Jump-related
         public float jumpHeight = 40f;          // Force applied to character when jumping off of ground
         public float bounceHeight = 20f;        // Force applied to character when hitting enemy
-        private bool inAir;                      // Whether character is in air (true) or on ground (false)
+        private bool inAir;                     // Whether character is in air (true) or on ground (false)
         private bool jumping;                   // Whether character has initiated a jump (reset on full transition to jumping animation state)
         private float moveHeight;               // Upward force on character
         private bool closeToJumpableGround;     // Whether character is close to ground or not
@@ -40,8 +40,10 @@ public class PlayerController : MonoBehaviour
         private bool aiming;                    // Whether character is aiming
     // Animation-related
         private bool changedState;              // Whether character has changed state since last hit
-    // Attack-related
-        private bool airAttack;
+    // Attack/input-related
+        private bool airAttack;                 // Whether character can still attack in air
+        public float noInputTime = 0.3f;        // Time after attack connects in which player cannot affect movement
+        private float noInput;                  // Storage for above
 
     // Reserved sections for future updates
     [Header("UI")]
@@ -50,7 +52,8 @@ public class PlayerController : MonoBehaviour
     private int score = 0;
 
     /*[Header("Camera Shake")]
-    public float shakeThreshold = 4f;
+    public float shakeGroundAttack = 10f;
+    public float shakeAirAttack = 15f;
     public float shakeDecrease = 10f;
     private bool thresholdReached = false;
     private float mostRecentYVel = 0f;*/
@@ -184,17 +187,28 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Calculate movement vector
         float moveHorizontal = 0f;
         float moveVertical = 0f;
-        moveHorizontal = Input.GetAxis("Horizontal");
-        moveVertical = Input.GetAxis("Vertical");
-        Vector2 moveCalc = new Vector2(moveHorizontal, moveVertical);
-        moveCalc.Normalize();
-        float xzVel = moveCalc.magnitude;
-        Vector3 movement = new Vector3(moveCalc.x, moveHeight, moveCalc.y);
-        Vector3 movementXZ = new Vector3(moveCalc.x, 0, moveCalc.y);
+        Vector2 moveCalc = new Vector2();
+        float xzVel = 0f;
+        Vector3 movement = new Vector3();
+        Vector3 movementXZ = new Vector3();
 
+        // Calculate movement vector
+        if (noInput <= 0f)
+        {
+            moveHorizontal = Input.GetAxis("Horizontal");
+            moveVertical = Input.GetAxis("Vertical");
+            moveCalc = new Vector2(moveHorizontal, moveVertical);
+            moveCalc.Normalize();
+            xzVel = moveCalc.magnitude;
+            movement = new Vector3(moveCalc.x, moveHeight, moveCalc.y);
+            movementXZ = new Vector3(moveCalc.x, 0, moveCalc.y);
+        }
+        else // Decay no input time
+        {
+            noInput -= 1f * Time.deltaTime;
+        }
 
         anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
         // If in attack animation, only allow movement on transition back to "Ground"/"Falling"
@@ -328,7 +342,7 @@ public class PlayerController : MonoBehaviour
             // Do a bounce if airborne hit
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
             {
-                //rbody.velocity = Vector3.zero;
+                rbody.velocity = Vector3.zero;
                 //rbody.angularVelocity = Vector3.zero;
                 moveHeight = bounceHeight;
                 Bounce(other, 15f, 1000f);
@@ -358,6 +372,7 @@ public class PlayerController : MonoBehaviour
         dir = dir.normalized;
         dir = new Vector3(dir.x * xzMult, dir.y, dir.z * xzMult);
         rbody.AddForce(dir.normalized * force);
+        noInput = noInputTime;
     }
     private void Bounce(Collider col, float xzMult, float force)
     {
@@ -365,6 +380,7 @@ public class PlayerController : MonoBehaviour
         dir = dir.normalized;
         dir = new Vector3(dir.x * xzMult, dir.y, dir.z * xzMult);
         rbody.AddForce(dir.normalized * force);
+        noInput = noInputTime;
     }
 
 
