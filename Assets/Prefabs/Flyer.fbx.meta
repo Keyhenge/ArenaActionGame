@@ -1,0 +1,191 @@
+fileFormatVersion: 2
+guid: 1d2a2d652bf794b55a12de6b74441d4f
+ModelImporter:
+  serializedVersion: 23
+  fileIDToRecycleName:
+    100000: Center_Tooth
+    100002: Center_Tooth1
+    100004: Eye1
+    100006: Eye2
+    100008: Eye3
+    100010: Eye4
+    100012: Eye5
+    100014: Eye6
+    100016: Flyer
+    100018: //RootNode
+    100020: Flyer2
+    100022: Head
+    100024: Left_Tooth
+    100026: polySurface1
+    100028: polySurface10
+    100030: polySurface2
+    100032: polySurface3
+    100034: polySurface4
+    100036: polySurface5
+    100038: polySurface6
+    100040: polySurface7
+    100042: polySurface8
+    100044: polySurface9
+    100046: Right_Tooth
+    100048: Teeth
+    100050: transform1
+    100052: transform10
+    100054: transform11
+    100056: transform12
+    100058: transform13
+    100060: transform14
+    100062: transform15
+    100064: transform16
+    100066: transform17
+    100068: transform18
+    100070: transform19
+    100072: transform2
+    100074: transform20
+    100076: transform21
+    100078: transform22
+    100080: transform23
+    100082: transform3
+    100084: transform4
+    100086: transform5
+    100088: transform6
+    100090: transform7
+    100092: transform8
+    100094: transform9
+    400000: Center_Tooth
+    400002: Center_Tooth1
+    400004: Eye1
+    400006: Eye2
+    400008: Eye3
+    400010: Eye4
+    400012: Eye5
+    400014: Eye6
+    400016: //RootNode
+    400018: Flyer
+    400020: Flyer2
+    400022: Head
+    400024: Left_Tooth
+    400026: polySurface1
+    400028: polySurface10
+    400030: polySurface2
+    400032: polySurface3
+    400034: polySurface4
+    400036: polySurface5
+    400038: polySurface6
+    400040: polySurface7
+    400042: polySurface8
+    400044: polySurface9
+    400046: Right_Tooth
+    400048: Teeth
+    400050: transform1
+    400052: transform10
+    400054: transform11
+    400056: transform12
+    400058: transform13
+    400060: transform14
+    400062: transform15
+    400064: transform16
+    400066: transform17
+    400068: transform18
+    400070: transform19
+    400072: transform2
+    400074: transform20
+    400076: transform21
+    400078: transform22
+    400080: transform23
+    400082: transform3
+    400084: transform4
+    400086: transform5
+    400088: transform6
+    400090: transform7
+    400092: transform8
+    400094: transform9
+    2100000: lambert1
+    2300000: Flyer2
+    3300000: Flyer2
+    4300000: Flyer2
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    importConstraints: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    useSRGBMaterialColor: 1
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+    previousCalculatedGlobalScale: 1
+    hasPreviousCalculatedGlobalScale: 0
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+    legacyComputeAllNormalsFromSmoothingGroupsWhenMeshHasBlendShapes: 0
+    blendShapeNormalImportMode: 1
+    normalSmoothingSource: 0
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
