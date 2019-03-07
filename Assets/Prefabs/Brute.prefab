@@ -4420,7 +4420,13 @@ MonoBehaviour:
   player: {fileID: 0}
   enemyHealth: 1
   halo: {fileID: 1773675463}
-  state: 0
+  waypoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  state: 4
 --- !u!195 &1773675458
 NavMeshAgent:
   m_ObjectHideFlags: 0
