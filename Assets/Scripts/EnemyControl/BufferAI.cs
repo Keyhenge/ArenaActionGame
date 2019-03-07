@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class BasicEnemyMovement : MonoBehaviour
+public class BufferAI : MonoBehaviour
 {
     public PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
