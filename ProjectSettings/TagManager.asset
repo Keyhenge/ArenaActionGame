@@ -7,6 +7,7 @@ TagManager:
   - ground
   - brute
   - enemy
+  - buffer
   layers:
   - Default
   - TransparentFX
