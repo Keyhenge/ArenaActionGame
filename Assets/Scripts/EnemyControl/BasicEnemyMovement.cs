@@ -30,6 +30,7 @@ public class BasicEnemyMovement : MonoBehaviour
     void Start()
     {
         playerHealth = player.getHealth();
+        Debug.Log("playerHealth: " + playerHealth);
         nav = GetComponent<NavMeshAgent>();
         nav.enabled = true;
         state = States.Idle;
@@ -43,6 +44,7 @@ public class BasicEnemyMovement : MonoBehaviour
             case States.Chase:
                 chase_player();
                 halo.enabled = false;
+                //Debug.Log(playerHealth);
                 if (enemyHealth == 0)
                 {
                     state = States.Dead;
@@ -99,7 +101,7 @@ public class BasicEnemyMovement : MonoBehaviour
                     state = States.Dead;
                     break;
                 }
-                if (!nav.Raycast(player.getPosition(), out ht) && ht.distance < 15)
+                if (!nav.Raycast(player.getPosition(), out ht) && ht.distance < 115)
                 {
                     state = States.Chase;
                 }
@@ -147,13 +149,13 @@ public class BasicEnemyMovement : MonoBehaviour
         return enemyHealth;
     }
 
-    public void hit()
+    public void Hit()
     {
         enemyHealth -= 1;
 
         if (enemyHealth <= 0)
         {
-            Destroy(this.gameObject);
+            Destroy(this.gameObject.transform.root.gameObject);
         }
     }
 

@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     public DeathMenuController deathScreen;
     public Text scoreText;
     private int score = 0;
+    public Image crosshairs;
 
     [Header("Camera Shake")]
     public float shakeGroundAttack = 10f;
@@ -76,6 +77,8 @@ public class PlayerController : MonoBehaviour
         cinput = GetComponent<CharacterInputController>();
         if (cinput == null)
             Debug.Log("CharacterInputController could not be found");
+
+        health = maxHealth;
     }
 
 
@@ -86,10 +89,10 @@ public class PlayerController : MonoBehaviour
 
         //never sleep so that OnCollisionStay() always reports for ground check
         rbody.sleepThreshold = 0f;
-        health = maxHealth;
 
         auxCam.enabled = false;
         mainCam.enabled = true;
+        crosshairs.enabled = false;
         anim.speed = animationSpeed;
         changedState = true;
     }
@@ -133,12 +136,10 @@ public class PlayerController : MonoBehaviour
             }
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
             {
-                //Debug.Log("Air swiped");
                 anim.SetBool("airAttack", airAttack);
             }
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
             {
-                //Debug.Log("Swiped");
                 anim.ResetTrigger("attack");
             }
 
@@ -154,7 +155,7 @@ public class PlayerController : MonoBehaviour
                 jumping = false;
             }
 
-            // Aim
+            // Aim/Fire
             if (Input.GetKey(KeyCode.Mouse1) && !aiming)
             {
                 Debug.Log("Player: Aim");
@@ -164,6 +165,12 @@ public class PlayerController : MonoBehaviour
             {
                 Debug.Log("Player: Stop aiming");
                 aiming = false;
+            }
+            if (Input.GetKeyDown(KeyCode.Mouse0) && aiming && anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+            {
+                Debug.Log("Player: Fire");
+                anim.SetTrigger("attack");
+                FireRifle();
             }
 
             // Attack recovery
@@ -176,15 +183,18 @@ public class PlayerController : MonoBehaviour
         }
 
         // Switch between first-person and third-person
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Fire Rifle"))
         {
             auxCam.enabled = true;
             mainCam.enabled = false;
+            crosshairs.enabled = true;
+            Debug.DrawRay(auxCam.transform.position, auxCam.transform.forward * 40, Color.green);
         }
         else
         {
             auxCam.enabled = false;
             mainCam.enabled = true;
+            crosshairs.enabled = false;
         }
     }
 
@@ -291,6 +301,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void FireRifle()
+    {
+        RaycastHit hit = new RaycastHit();
+        Vector3 a = this.transform.position;
+        Vector3 b = auxCam.transform.forward;
+
+        if (Physics.Raycast(auxCam.transform.position, auxCam.transform.forward, out hit, 10000f, 1 << 10))
+        {
+            Debug.Log("Player: Hit enemy with Rifle");
+            GameObject enemy = hit.collider.gameObject;
+
+            // Brute
+            if (enemy.transform.root.GetChild(0).GetComponent<BasicEnemyMovement>() != null)
+            {
+                Debug.Log("Player: Hit Brute with Rifle");
+                BasicEnemyMovement brute = enemy.transform.root.GetChild(0).GetComponent<BasicEnemyMovement>();
+                if (brute.getHealth() == 1)
+                {
+                    Debug.Log("Player: Killed Brute");
+                    score++;
+                    scoreText.text = "Score: " + score.ToString();
+                    spawner.KilledEnemy();
+                }
+                brute.Hit();
+            }
+        }
+    }
+
 
     /* Collisions */
     private void OnCollisionEnter(Collision collision)
@@ -347,7 +385,7 @@ public class PlayerController : MonoBehaviour
                 scoreText.text = "Score: " + score.ToString();
                 spawner.KilledEnemy();
             }
-            brute.hit();
+            brute.Hit();
 
             changedState = false;
         }
