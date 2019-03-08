@@ -22,7 +22,10 @@ public class DeathMenuController : MonoBehaviour
         if (playerDied)
         {
             deathMenu.SetActive(true);
-            Time.timeScale = 0f;
+            Time.timeScale = 0.1f;
+        } else
+        {
+            Time.timeScale = 1f;
         }
     }
 

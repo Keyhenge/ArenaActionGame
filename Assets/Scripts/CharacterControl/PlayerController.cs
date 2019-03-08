@@ -340,8 +340,7 @@ public class PlayerController : MonoBehaviour
             moveHeight = 0;
         } else if (collision.transform.gameObject.tag == "enemy")
         {
-            Debug.Log("Player: Contact Damage");
-            health -= 1;
+            TakeDamage();
             Bounce(collision, 5f, 1000f);
         }
     }
@@ -388,7 +387,17 @@ public class PlayerController : MonoBehaviour
             brute.Hit();
 
             changedState = false;
+        } else if (other.transform.tag == "brute")
+        {
+            TakeDamage();
         }
+    }
+
+    /* Interactions */
+    private void TakeDamage()
+    {
+        Debug.Log("Player: Contact Damage");
+        health -= 1;
     }
 
     private void Bounce(Collision col, float xzMult, float force)

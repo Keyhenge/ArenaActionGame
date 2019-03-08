@@ -2138,6 +2138,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 2030492185, guid: 67e4c2aa5c5ce604f82d5b2322ac3b32, type: 3}
+      propertyPath: m_TagString
+      value: player
+      objectReference: {fileID: 0}
     - target: {fileID: 2030492191, guid: 67e4c2aa5c5ce604f82d5b2322ac3b32, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.33
@@ -2230,6 +2234,10 @@ PrefabInstance:
       propertyPath: crosshairs
       value: 
       objectReference: {fileID: 947494702}
+    - target: {fileID: 2030492186, guid: 67e4c2aa5c5ce604f82d5b2322ac3b32, type: 3}
+      propertyPath: maxHealth
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1211356238, guid: 67e4c2aa5c5ce604f82d5b2322ac3b32, type: 3}
       propertyPath: m_Layer
       value: 9

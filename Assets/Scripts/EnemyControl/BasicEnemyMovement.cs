@@ -6,17 +6,17 @@ using UnityEngine.AI;
 [RequireComponent(typeof(NavMeshAgent))]
 public class BasicEnemyMovement : MonoBehaviour
 {
-    public PlayerController player;        // Reference to the player.
+    private PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
+    public GameObject aoe;
     public int enemyHealth = 3;
     private int playerHealth;
     public Behaviour halo;
     private int cwp = -1;
     public GameObject[] waypoints;
     private NavMeshHit ht;
-    //public Animator anim;
+    private Animator anim;
   
-    //public Animator anim;
     public enum States
     {
         Chase,
@@ -29,41 +29,52 @@ public class BasicEnemyMovement : MonoBehaviour
 
     void Start()
     {
-        playerHealth = player.getHealth();
-        Debug.Log("playerHealth: " + playerHealth);
+        player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
         nav = GetComponent<NavMeshAgent>();
         nav.enabled = true;
+        anim = GetComponent<Animator>();
         state = States.Idle;
     }
 
     // Update is called once per frame
     void Update()
     {
-        switch(state)
+        playerHealth = player.getHealth();
+        //Debug.Log("playerHealth: " + playerHealth);
+
+        switch (state)
         {
             case States.Chase:
-                chase_player();
-                halo.enabled = false;
-                //Debug.Log(playerHealth);
-                if (enemyHealth == 0)
+                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Walking") || anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack"))
                 {
-                    state = States.Dead;
-                    break;
-                }
-                if (playerHealth == 0)
+                    chase_player();
+                    aoe.SetActive(false);
+                    halo.enabled = false;
+                    //Debug.Log(playerHealth);
+                    if (enemyHealth == 0)
+                    {
+                        state = States.Dead;
+                        break;
+                    }
+                    if (playerHealth == 0)
+                    {
+                        state = States.PDead;
+                        break;
+                    }
+                    if (Vector3.Distance(nav.transform.position, player.getPosition()) <= 6)
+                    {
+                        state = States.Attack;
+                        break;
+                    }
+                    if (nav.Raycast(player.getPosition(), out ht))
+                    {
+                        getWP();
+                        state = States.Idle;
+                    }
+                } else if (anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack Damage"))
                 {
-                    state = States.PDead;
-                    break;
-                }
-                if(Vector3.Distance(nav.transform.position, player.getPosition()) <= 6)
-                {
-                    state = States.Attack;
-                    break;
-                }
-                if (nav.Raycast(player.getPosition(), out ht))
-                {
-                    getWP();
-                    state = States.Idle;
+                    Debug.Log("Enemy: AOE attack");
+                    aoe.SetActive(true);
                 }
                 break;
 
@@ -79,6 +90,7 @@ public class BasicEnemyMovement : MonoBehaviour
                     break;
                 }
                 attack();
+                state = States.Idle;
                 break;
 
             case States.PDead:
@@ -141,6 +153,7 @@ public class BasicEnemyMovement : MonoBehaviour
     {
         //add attack funtionality when animation and stuff is done
         halo.enabled = true;
+        anim.SetTrigger("Attack");
     }
 
     /* Health-related methods */
