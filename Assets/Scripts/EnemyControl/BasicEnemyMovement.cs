@@ -27,7 +27,7 @@ public class BasicEnemyMovement : MonoBehaviour
     };
     public States state;
 
-    void Awake()
+    void Start()
     {
         playerHealth = player.getHealth();
         nav = GetComponent<NavMeshAgent>();
@@ -58,7 +58,7 @@ public class BasicEnemyMovement : MonoBehaviour
                     state = States.Attack;
                     break;
                 }
-                if (nav.Raycast(GameObject.FindGameObjectWithTag("Player").transform.position, out ht))
+                if (nav.Raycast(player.getPosition(), out ht))
                 {
                     getWP();
                     state = States.Idle;
@@ -99,7 +99,7 @@ public class BasicEnemyMovement : MonoBehaviour
                     state = States.Dead;
                     break;
                 }
-                if (!nav.Raycast(GameObject.FindGameObjectWithTag("Player").transform.position, out ht) && ht.distance < 15)
+                if (!nav.Raycast(player.getPosition(), out ht) && ht.distance < 15)
                 {
                     state = States.Chase;
                 }
