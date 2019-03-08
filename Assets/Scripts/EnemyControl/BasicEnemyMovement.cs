@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
 public class BasicEnemyMovement : MonoBehaviour
 {
     private PlayerController player;        // Reference to the player.
@@ -16,6 +15,7 @@ public class BasicEnemyMovement : MonoBehaviour
     public GameObject[] waypoints;
     private NavMeshHit ht;
     private Animator anim;
+    private float attackTime;
   
     public enum States
     {
@@ -30,7 +30,7 @@ public class BasicEnemyMovement : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
-        nav = GetComponent<NavMeshAgent>();
+        nav = this.transform.root.GetComponent<NavMeshAgent>();
         nav.enabled = true;
         anim = GetComponent<Animator>();
         state = States.Idle;
@@ -45,9 +45,10 @@ public class BasicEnemyMovement : MonoBehaviour
         switch (state)
         {
             case States.Chase:
-                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Walking") || anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack"))
+                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Walking"))
                 {
                     chase_player();
+                    nav.enabled = true;
                     aoe.SetActive(false);
                     halo.enabled = false;
                     //Debug.Log(playerHealth);
@@ -61,8 +62,9 @@ public class BasicEnemyMovement : MonoBehaviour
                         state = States.PDead;
                         break;
                     }
-                    if (Vector3.Distance(nav.transform.position, player.getPosition()) <= 6)
+                    if (Vector3.Distance(this.transform.position, player.getPosition()) <= 20 || attackTime > 10)
                     {
+                        attackTime = 0;
                         state = States.Attack;
                         break;
                     }
@@ -71,10 +73,17 @@ public class BasicEnemyMovement : MonoBehaviour
                         getWP();
                         state = States.Idle;
                     }
-                } else if (anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack Damage"))
+                }
+                else if (anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack Damage"))
                 {
-                    Debug.Log("Enemy: AOE attack");
+                    nav.enabled = false;
                     aoe.SetActive(true);
+                }
+                else if (anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack"))
+                {
+                    anim.ResetTrigger("Attack");
+                    nav.enabled = false;
+                    aoe.SetActive(false);
                 }
                 break;
 
@@ -113,7 +122,7 @@ public class BasicEnemyMovement : MonoBehaviour
                     state = States.Dead;
                     break;
                 }
-                if (!nav.Raycast(player.getPosition(), out ht) && ht.distance < 115)
+                if (!nav.Raycast(player.getPosition(), out ht) && ht.distance < 100)
                 {
                     state = States.Chase;
                 }
@@ -136,16 +145,21 @@ public class BasicEnemyMovement : MonoBehaviour
 
     }
 
+    private void FixedUpdate()
+    {
+        attackTime += 1 * Time.deltaTime;
+    }
+
     private void chase_player()
     {
         // need to add anim to movement
-        if (nav.pathPending == false && nav.remainingDistance <= 3)
+        /*if (nav.pathPending == false && nav.remainingDistance <= 3)
         {
             nav.ResetPath();
             nav.SetDestination(player.getPosition());
-        }
+        }*/
         //nav.ResetPath();
-        //nav.SetDestination(player.getPosition());
+        nav.SetDestination(player.getPosition());
         //anim.
     }
 
