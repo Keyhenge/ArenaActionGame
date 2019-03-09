@@ -51,17 +51,22 @@ public class PlayerController : MonoBehaviour
     public Text scoreText;
     private int score = 0;
     public Image crosshairs;
+    public Text healthText;
+    public Text ammoText;
 
     [Header("Camera Shake")]
-    public float shakeGroundAttack = 10f;
-    public float shakeAirAttack = 15f;
-    public float shakeDamage = 5f;
-    public float shakeDecrease = 10f;
+    public float shakeGroundAttack = 3f;        // Shake on hit with ground attack
+    public float shakeAirAttack = 3f;           // Shake on hit with air attack
+    public float shakeDamage = 2f;              // Shake on damage taken
+    public float shakeKill = 4f;                // Shake on enemy kill
+    public float shakeTime = 0.5f;              // Time shake lasts
 
     [Header("Game Stats")]
-    public int maxHealth = 2;                   // Max health
-    public int health;                          // Remaining health
-    public int ammo;                            // Remaining ammo
+    public int maxHealth = 5;                   // Max health allowed/restored
+    public int maxAmmo = 5;                     // Max ammo allowed/restored
+    private float invincible = 0f;              // Container for invincible frames
+    private int health;                         // Remaining health
+    private int ammo;                           // Remaining ammo
 
 
     void Awake()
@@ -79,6 +84,7 @@ public class PlayerController : MonoBehaviour
             Debug.Log("CharacterInputController could not be found");
 
         health = maxHealth;
+        ammo = maxAmmo;
     }
 
 
@@ -100,10 +106,15 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // If player has no health left, they're dead
         if (health <= 0)
         {
             deathScreen.playerDied = true;
         }
+
+        // Update UI elements
+        healthText.text = "Health: " + health;
+        ammoText.text = "Ammo: " + ammo;
 
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
@@ -168,9 +179,17 @@ public class PlayerController : MonoBehaviour
             }
             if (Input.GetKeyDown(KeyCode.Mouse0) && aiming && anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
             {
-                Debug.Log("Player: Fire");
-                anim.SetTrigger("attack");
-                FireRifle();
+                if (ammo > 0)
+                {
+                    Debug.Log("Player: Fire");
+                    anim.SetTrigger("attack");
+                    FireRifle();
+                    ammo--;
+                }
+                else
+                {
+                    Debug.Log("Player: Out of Ammo");
+                }
             }
 
             // Attack recovery
@@ -201,6 +220,11 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (invincible > 0)
+        {
+            invincible -= Time.deltaTime;
+        }
+
         float moveHorizontal = 0f;
         float moveVertical = 0f;
         Vector2 moveCalc = new Vector2();
@@ -226,23 +250,12 @@ public class PlayerController : MonoBehaviour
 
         anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
         // If in attack animation, only allow movement on transition back to "Ground"/"Falling"
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle")))
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Fire Rifle")))
         {
             movement = new Vector3();
             xzVel = 0f;
             moveHeight = 0f;
         }
-
-        /* Allows for shake on jump
-        if (rbody.velocity.y * -1 > shakeThreshold)
-        {
-            thresholdReached = true;
-        }
-        else
-        {
-            thresholdReached = false;
-        }
-        mostRecentYVel = rbody.velocity.y;*/
 
         // Calculate character translation
         if (xzVel > 0)
@@ -272,7 +285,7 @@ public class PlayerController : MonoBehaviour
                 rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
             }
         }
-        else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle"))
+        else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Fire Rifle"))
         {
             Vector3 rotateTarget = new Vector3(auxCamTarget.transform.position.x - this.transform.position.x, 0, auxCamTarget.transform.position.z - this.transform.position.z);
 
@@ -304,8 +317,6 @@ public class PlayerController : MonoBehaviour
     void FireRifle()
     {
         RaycastHit hit = new RaycastHit();
-        Vector3 a = this.transform.position;
-        Vector3 b = auxCam.transform.forward;
 
         if (Physics.Raycast(auxCam.transform.position, auxCam.transform.forward, out hit, 10000f, 1 << 10))
         {
@@ -327,6 +338,7 @@ public class PlayerController : MonoBehaviour
                 brute.Hit();
             }
         }
+        auxCamTarget.GetComponent<AuxCameraController>().shake(shakeAirAttack / 4f);
     }
 
 
@@ -338,7 +350,8 @@ public class PlayerController : MonoBehaviour
             //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
             inAir = false;
             moveHeight = 0;
-        } else if (collision.transform.gameObject.tag == "enemy")
+        }
+        else if (collision.transform.gameObject.tag == "enemy")
         {
             TakeDamage();
             Bounce(collision, 5f, 1000f);
@@ -362,14 +375,19 @@ public class PlayerController : MonoBehaviour
         // Hit Brute head
         if (other.transform.gameObject.name == "Head" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
         {
-            Debug.Log("Player: Hit Brute");
+            Debug.Log("Player: Hit Brute with Sword");
             // Do a bounce if airborne hit
             if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
             {
+                mainCam.GetComponent<CameraController>().shake(shakeAirAttack, shakeTime);
                 rbody.velocity = Vector3.zero;
                 //rbody.angularVelocity = Vector3.zero;
                 moveHeight = bounceHeight;
                 Bounce(other, 15f, 1000f);
+            }
+            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeGroundAttack, shakeTime);
             }
 
             // Head -> pSphere11 -> Brute
@@ -380,6 +398,7 @@ public class PlayerController : MonoBehaviour
             if (brute.getHealth() == 1)
             {
                 Debug.Log("Player: Killed Brute");
+                mainCam.GetComponent<CameraController>().shake(shakeKill, shakeTime+0.1f);
                 score++;
                 scoreText.text = "Score: " + score.ToString();
                 spawner.KilledEnemy();
@@ -396,8 +415,16 @@ public class PlayerController : MonoBehaviour
     /* Interactions */
     private void TakeDamage()
     {
-        Debug.Log("Player: Contact Damage");
-        health -= 1;
+        if (invincible <= 0)
+        {
+            Debug.Log("Player: Took Damage");
+            health -= 1;
+            if (health > 0)
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeDamage, shakeTime);
+            }
+            invincible = 1f;
+        }
     }
 
     private void Bounce(Collision col, float xzMult, float force)

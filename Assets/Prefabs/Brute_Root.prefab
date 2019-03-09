@@ -800,7 +800,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aoe: {fileID: 2559235714280879140}
-  enemyHealth: 1
+  enemyHealth: 3
   halo: {fileID: 6163754782827571826}
   waypoints:
   - {fileID: 0}

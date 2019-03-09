@@ -108,14 +108,31 @@ public class AuxCameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        camTransform.position = Vector3.up * 5f + player.transform.position - Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
+        //camTransform.position = Vector3.up * 5f + player.transform.position - Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
         playerAnimator.SetFloat("cameraAngle", curY);
+
+        // Camera Shake
+        originalPos = Vector3.up * 5f + player.transform.position - Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
+        // Borrowed from https://gist.github.com/ftvs/5822103
+        // Shakes camera for a period of time
+        if (shakeTime > 0)
+        {
+            Vector3 shakePos = originalPos + Random.insideUnitSphere * shakeAmount;
+            camTransform.position = shakePos;
+            shakeTime -= Time.deltaTime * shakeDecrease;
+            shakeAmount = shakeAmountInit * shakeTime;
+        }
+        else
+        {
+            shakeTime = 0f;
+            camTransform.position = originalPos;
+        }
     }
 
     public void shake(float amount)
     {
         shakeAmountInit = amount;
-        shakeTime = 1f;
+        shakeTime = 0.3f;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

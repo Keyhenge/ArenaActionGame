@@ -72,7 +72,7 @@ public class CameraController : MonoBehaviour
         offset = Mathf.Clamp(offset, minDistance, maxDistance);
 
         // Transparency
-        /*// Borrowed from https://answers.unity.com/questions/44815/make-object-transparent-when-between-camera-and-pl.html
+        // Borrowed from https://answers.unity.com/questions/44815/make-object-transparent-when-between-camera-and-pl.html
         // Makes objects between the camera and player transparent
         RaycastHit[] hits; // you can also use CapsuleCastAll() 
                            // TODO: setup your layermask it improve performance and filter your hits. 
@@ -98,35 +98,34 @@ public class CameraController : MonoBehaviour
             }
             AT.BeTransparent(); // get called every frame to reset the falloff
         }
+    }
 
+    private void LateUpdate()
+    {
         // Camera Shake
-        originalPos = player.transform.position + offset;
+        originalPos = Vector3.up * 5f + player.transform.position + Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer - offset));
         // Borrowed from https://gist.github.com/ftvs/5822103
         // Shakes camera for a period of time
         if (shakeTime > 0)
         {
             Vector3 shakePos = originalPos + Random.insideUnitSphere * shakeAmount;
-            transform.position = shakePos;
+            camTransform.position = shakePos;
             shakeTime -= Time.deltaTime * shakeDecrease;
-            shakeAmount = shakeAmountInit * Mathf.Clamp(1f - shakeTime, 0, 1f) / 1f;
+            shakeAmount = shakeAmountInit * shakeTime;
         }
         else
         {
             shakeTime = 0f;
-            transform.position = originalPos;
-        }*/
-    }
+            camTransform.position = originalPos;
+        }
 
-    private void LateUpdate()
-    {
-        camTransform.position = Vector3.up * 5f + player.transform.position + Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer - offset));
         camTransform.LookAt(Vector3.up * 5f + player.transform.position);
     }
 
-    public void shake(float amount)
+    public void shake(float amount, float time)
     {
         shakeAmountInit = amount;
-        shakeTime = 1f;
+        shakeTime = time;
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)

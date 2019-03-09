@@ -8,6 +8,7 @@ public class PauseMenuController : MonoBehaviour
     public string mainMenuScene;
     public GameObject pauseMenu;
     public GameObject deathMenu;
+    public GameObject overlay;
     public bool isPaused;
 
     // Start is called before the first frame update
@@ -29,6 +30,7 @@ public class PauseMenuController : MonoBehaviour
             {
                 isPaused = true;
                 pauseMenu.SetActive(true);
+                overlay.SetActive(false);
                 Time.timeScale = 0f;
             }
         }
@@ -38,6 +40,7 @@ public class PauseMenuController : MonoBehaviour
     {
         isPaused = false;
         pauseMenu.SetActive(false);
+        overlay.SetActive(true);
         Time.timeScale = 1f;
     }
 

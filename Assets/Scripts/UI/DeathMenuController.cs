@@ -8,6 +8,7 @@ public class DeathMenuController : MonoBehaviour
     public string mainMenuScene;
     public string arenaScene;
     public GameObject deathMenu;
+    public GameObject overlay;
     public bool playerDied;
 
     // Start is called before the first frame update
@@ -22,10 +23,8 @@ public class DeathMenuController : MonoBehaviour
         if (playerDied)
         {
             deathMenu.SetActive(true);
-            Time.timeScale = 0.1f;
-        } else
-        {
-            Time.timeScale = 1f;
+            Time.timeScale = 0f;
+            overlay.SetActive(false);
         }
     }
 
@@ -45,6 +44,7 @@ public class DeathMenuController : MonoBehaviour
     {
         playerDied = false;
         deathMenu.SetActive(false);
+        overlay.SetActive(true);
         Time.timeScale = 1f;
     }
 }
