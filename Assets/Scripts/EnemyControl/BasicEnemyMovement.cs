@@ -29,6 +29,7 @@ public class BasicEnemyMovement : MonoBehaviour
 
     void Start()
     {
+        waypoints = GameObject.FindGameObjectsWithTag("wp");
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
         nav = this.transform.root.GetComponent<NavMeshAgent>();
         nav.enabled = true;
@@ -184,6 +185,11 @@ public class BasicEnemyMovement : MonoBehaviour
         {
             Destroy(this.transform.root.gameObject);
         }
+    }
+
+    public void doubleHealth()
+    {
+        enemyHealth = enemyHealth + enemyHealth;
     }
 
     private void setNextWaypoint()

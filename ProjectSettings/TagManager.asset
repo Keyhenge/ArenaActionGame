@@ -9,6 +9,8 @@ TagManager:
   - enemy
   - buffer
   - player
+  - Fire
+  - wp
   layers:
   - Default
   - TransparentFX
