@@ -70,7 +70,7 @@ public class BasicEnemyMovement : MonoBehaviour
                     }
                     if (nav.Raycast(player.getPosition(), out ht))
                     {
-                        getWP();
+                        //getWP();
                         state = States.Idle;
                     }
                 }

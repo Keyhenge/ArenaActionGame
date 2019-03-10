@@ -73,6 +73,8 @@ public class EnemySpawner : MonoBehaviour
         Instantiate(enemies[enemy], spawnPoints[spawnPoint].position, spawnPoints[spawnPoint].rotation);
         currentEnemyCount++;
         totalEnemyCount++;
+        Debug.Log("\tSpawner: currentEnemyCount: " + currentEnemyCount);
+        Debug.Log("\tSpawner: totalEnemyCount: " + totalEnemyCount);
     }
 
     public void KilledEnemy()
@@ -120,6 +122,7 @@ public class EnemySpawner : MonoBehaviour
     private void StartWave()
     {
         Debug.Log("\tSpawner: Starting Wave");
+        Debug.Log("\tSpawner: wave: " + wave);
         directionalLight.intensity = 1f;
         spotlight.intensity = 0f;
         currentEnemyCount = 0;
