@@ -3,81 +3,49 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-[RequireComponent(typeof(NavMeshAgent))]
 public class BufferAI : MonoBehaviour
 {
-    public PlayerController player;        // Reference to the player.
+    private PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
-    public int enemyHealth = 3;
+    public GameObject aoe;
+    public int enemyHealth = 1;
     private int playerHealth;
     public Behaviour halo;
     private int cwp = -1;
     public GameObject[] waypoints;
     private NavMeshHit ht;
-    //public Animator anim;
+    private Animator anim;
+    private float attackTime = 10;
+    private GameObject[] allies;
+    private GameObject closest;
   
-    //public Animator anim;
     public enum States
     {
-        Chase,
-        Attack,
+        Shield,
         PDead,
         Dead,
         Idle
     };
     public States state;
 
-    void Awake()
+    void Start()
     {
-        playerHealth = player.getHealth();
-        nav = GetComponent<NavMeshAgent>();
+        player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
+        allies = GameObject.FindGameObjectsWithTag("enemy");
+        nav = this.transform.root.GetComponent<NavMeshAgent>();
         nav.enabled = true;
+        anim = GetComponent<Animator>();
         state = States.Idle;
     }
 
     // Update is called once per frame
     void Update()
     {
-        switch(state)
-        {
-            case States.Chase:
-                chase_player();
-                halo.enabled = false;
-                if (enemyHealth == 0)
-                {
-                    state = States.Dead;
-                    break;
-                }
-                if (playerHealth == 0)
-                {
-                    state = States.PDead;
-                    break;
-                }
-                if(Vector3.Distance(nav.transform.position, player.getPosition()) <= 6)
-                {
-                    state = States.Attack;
-                    break;
-                }
-                if (nav.Raycast(GameObject.FindGameObjectWithTag("Player").transform.position, out ht))
-                {
-                    getWP();
-                    state = States.Idle;
-                }
-                break;
+        playerHealth = player.getHealth();
+        //Debug.Log("playerHealth: " + playerHealth);
 
-            case States.Attack:
-                if (playerHealth == 0)
-                {
-                    state = States.PDead;
-                    break;
-                } 
-                if (enemyHealth == 0)
-                {
-                    state = States.Dead;
-                    break;
-                }
-                attack();
-                break;
+        switch (state)
+        {
 
             case States.PDead:
                 halo.enabled = false;
@@ -94,24 +62,45 @@ public class BufferAI : MonoBehaviour
 
             case States.Idle:
                 halo.enabled = false;
+                allies = GameObject.FindGameObjectsWithTag("enemy");
                 if (enemyHealth == 0)
                 {
                     state = States.Dead;
                     break;
                 }
-                if (!nav.Raycast(GameObject.FindGameObjectWithTag("Player").transform.position, out ht) && ht.distance < 15)
+                getClosestAlly();
+                if (closest.activeSelf && closest.GetComponent<BasicEnemyMovement>().getHealth() > 0 && attackTime <= 0) 
                 {
-                    state = States.Chase;
+                    state = States.Shield;
+                    break;
                 }
-                else
+
+                if (nav.pathPending == false && nav.remainingDistance <= 2)
                 {
-                    //getWP();
-                    if (nav.pathPending == false && nav.remainingDistance <= 2)
-                    {
-                        setNextWaypoint();
-                    }
-                    // setNextWaypoint();
+                    setNextWaypoint();
                 }
+                  
+                break;
+
+            case States.Shield:
+                //anim.SetTrigger("shield");
+                if (closest.activeSelf)
+                {
+                    closest.GetComponent<BasicEnemyMovement>().doubleHealth();
+                    attackTime = 10;
+                }
+                //closest.GetComponent<BasicEnemyMovement>().doubleHealth();
+                if (enemyHealth == 0)
+                {
+                    state = States.Dead;
+                    break;
+                }
+                if (playerHealth == 0)
+                {
+                    state = States.PDead;
+                    break;
+                }
+                state = States.Idle;
                 break;
 
             default:
@@ -122,24 +111,23 @@ public class BufferAI : MonoBehaviour
 
     }
 
-    private void chase_player()
+    private void FixedUpdate()
     {
-        // need to add anim to movement
-        if (nav.pathPending == false && nav.remainingDistance <= 3)
-        {
-            nav.ResetPath();
-            nav.SetDestination(player.getPosition());
-        }
-        //nav.ResetPath();
-        //nav.SetDestination(player.getPosition());
-        //anim.
+        attackTime -= 1 * Time.deltaTime;
     }
 
-    private void attack()
+    private void getClosestAlly()
     {
-        //add attack funtionality when animation and stuff is done
-        halo.enabled = true;
+        closest = allies[0];
+        for (int i = 0; i < allies.Length; i++)
+        {
+            if (closest.GetComponent<BasicEnemyMovement>().getHealth() > allies[i].GetComponent<BasicEnemyMovement>().getHealth())
+            {
+                closest = allies[i];
+            }
+        }
     }
+
 
     /* Health-related methods */
     public int getHealth()
@@ -147,13 +135,13 @@ public class BufferAI : MonoBehaviour
         return enemyHealth;
     }
 
-    public void hit()
+    public void Hit()
     {
         enemyHealth -= 1;
 
         if (enemyHealth <= 0)
         {
-            Destroy(this.gameObject);
+            Destroy(this.transform.root.gameObject);
         }
     }
 
