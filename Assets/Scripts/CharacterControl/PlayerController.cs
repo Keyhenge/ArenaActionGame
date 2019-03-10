@@ -49,7 +49,6 @@ public class PlayerController : MonoBehaviour
     [Header("UI")]
     public DeathMenuController deathScreen;
     public Text scoreText;
-    private int score = 0;
     public Image crosshairs;
     public Text healthText;
     public Text ammoText;
@@ -67,6 +66,7 @@ public class PlayerController : MonoBehaviour
     private float invincible = 0f;              // Container for invincible frames
     private int health;                         // Remaining health
     private int ammo;                           // Remaining ammo
+    public int score;
 
 
     void Awake()
@@ -85,6 +85,7 @@ public class PlayerController : MonoBehaviour
 
         health = maxHealth;
         ammo = maxAmmo;
+        score = 0;
     }
 
 
@@ -115,6 +116,7 @@ public class PlayerController : MonoBehaviour
         // Update UI elements
         healthText.text = "Health: " + health;
         ammoText.text = "Ammo: " + ammo;
+        scoreText.text = "Score: " + score;
 
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
@@ -332,7 +334,6 @@ public class PlayerController : MonoBehaviour
                 {
                     Debug.Log("Player: Killed Brute");
                     score++;
-                    scoreText.text = "Score: " + score.ToString();
                     spawner.KilledEnemy();
                 }
                 brute.Hit();
@@ -400,7 +401,6 @@ public class PlayerController : MonoBehaviour
                 Debug.Log("Player: Killed Brute");
                 mainCam.GetComponent<CameraController>().shake(shakeKill, shakeTime+0.1f);
                 score++;
-                scoreText.text = "Score: " + score.ToString();
                 spawner.KilledEnemy();
             }
             brute.Hit();
@@ -425,6 +425,23 @@ public class PlayerController : MonoBehaviour
             }
             invincible = 1f;
         }
+    }
+
+    public void ResetHealth()
+    {
+        Debug.Log("Player: Picked up Health");
+        health = maxHealth;
+    }
+    public void ResetAmmo()
+    {
+        Debug.Log("Player: Picked up Ammo");
+        ammo = maxAmmo;
+    }
+
+    public void awardPoints(int points)
+    {
+        Debug.Log("Player: Gained Points");
+        score += points;
     }
 
     private void Bounce(Collision col, float xzMult, float force)

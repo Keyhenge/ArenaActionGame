@@ -5,19 +5,24 @@ using UnityEngine.UI;
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject[] enemies;
-    public float spawnTime = 5f;
-    public int maxEnemies = 10;
-    public Transform[] spawnPoints;
-    public int maxEnemiesPerWave = 20;
-    public int currentEnemyCount;
-    public int totalEnemyCount;
-    public int wave;
+    public GameObject[] enemies;            // List of enemy prefabs that can be spawned
+    public GameObject[] items;              // List of item prefabs that can be spawned between waves
+    public float spawnTime = 5f;            // Time between spawns
+    public int maxEnemies = 10;             // Max amount of enemies allowed on screen at once
+    public Transform[] spawnPoints;         // List of spawn points
+    public Transform itemSpawn;             // Spawn point for items
+    public int maxEnemiesPerWave = 20;      // Amount of enemies that will be spawned per wave
+    private int currentEnemyCount;          // Amount of enemies currently on screen
+    private int totalEnemyCount;            // Count of total enemies spawned so far this wave
+    private int wave;                       // Current wave count
+    public int waveBonus = 3;               // Bonus to score for completing a wave
+    public float timeBetweenWaves = 5f;     // Time between waves in seconds
 
-    public Light directionalLight;
-    public Light spotlight;
+    public Light directionalLight;          // Link to directional light used at all times
+    public Light spotlight;                 // Link to spotlight used during wave interim
 
-    public Text waveCount;
+    public Text waveCount;                  // Link to UI element describing current wave
+    private PlayerController player;        //
 
     public enum States
     {
@@ -38,6 +43,8 @@ public class EnemySpawner : MonoBehaviour
         spotlight.intensity = 0f;
         wave = 1;
         waveCount.text = "Wave: " + wave.ToString();
+
+        player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
     }
 
     // Update is called once per frame
@@ -47,7 +54,7 @@ public class EnemySpawner : MonoBehaviour
         {
             state = States.WaveEnd;
             EndWave();
-            Invoke(nameof(StartWave), 1f);
+            Invoke(nameof(StartWave), timeBetweenWaves);
         }
         else if (state == States.Waiting && currentEnemyCount < maxEnemies)
         {
@@ -83,6 +90,24 @@ public class EnemySpawner : MonoBehaviour
         spotlight.intensity = 1f;
         wave++;
         waveCount.text = "Wave: " + wave.ToString();
+
+        player.awardPoints(waveBonus);
+
+        // Spawn in item
+        int itemNum = Random.Range(0, items.Length);
+        GameObject item = Instantiate(items[itemNum], itemSpawn.position, itemSpawn.rotation);
+
+        // If player ignores item, award bonus points
+        if (item.transform.GetChild(0).GetComponent<CollectableHealth>() != null)
+        {
+            Debug.Log("Spawner: Spawned Health");
+            item.transform.GetChild(0).GetComponent<CollectableHealth>().extraPoints(timeBetweenWaves);
+        }
+        else if (item.transform.GetChild(0).GetComponent<CollectableAmmo>() != null)
+        {
+            Debug.Log("Spawner: Spawned Health");
+            item.transform.GetChild(0).GetComponent<CollectableAmmo>().extraPoints(timeBetweenWaves);
+        }
     }
 
     private void StartWave()

@@ -182,7 +182,7 @@ public class BasicEnemyMovement : MonoBehaviour
 
         if (enemyHealth <= 0)
         {
-            Destroy(this.gameObject.transform.root.gameObject);
+            Destroy(this.transform.root.gameObject);
         }
     }
 
