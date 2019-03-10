@@ -7,14 +7,18 @@ public class EnemySpawner : MonoBehaviour
 {
     public GameObject[] enemies;            // List of enemy prefabs that can be spawned
     public GameObject[] items;              // List of item prefabs that can be spawned between waves
+    public GameObject mine;                 // Link to landmine prefab
+    public int mineNumber = 1;              // How many mines are spawned per wave
+    private GameObject[] currentMines;      // Links to the mines in the scene already. For right now, must be less than 10
     public float spawnTime = 5f;            // Time between spawns
-    public int maxEnemies = 10;             // Max amount of enemies allowed on screen at once
-    public Transform[] spawnPoints;         // List of spawn points
+    public int maxEnemies = 10;             // Max amount of enemies allowed in the scene at once
+    public Transform[] spawnPoints;         // Spawn points for enemies
     public Transform itemSpawn;             // Spawn point for items
+    public Transform[] mineSpawns;          // Spawn points for mines
     public int maxEnemiesPerWave = 20;      // Amount of enemies that will be spawned per wave
-    private int currentEnemyCount;          // Amount of enemies currently on screen
+    private int currentEnemyCount;          // Amount of enemies currently in the scene
     private int totalEnemyCount;            // Count of total enemies spawned so far this wave
-    private int wave;                       // Current wave count
+    private int wave = 1;                   // Current wave count
     public int waveBonus = 3;               // Bonus to score for completing a wave
     public float timeBetweenWaves = 5f;     // Time between waves in seconds
 
@@ -22,7 +26,7 @@ public class EnemySpawner : MonoBehaviour
     public Light spotlight;                 // Link to spotlight used during wave interim
 
     public Text waveCount;                  // Link to UI element describing current wave
-    private PlayerController player;        //
+    private PlayerController player;        // Link to player
 
     public enum States
     {
@@ -35,16 +39,9 @@ public class EnemySpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        InvokeRepeating("Spawn", 1f, spawnTime);
-        state = States.Spawning;
-        currentEnemyCount = 0;
-        totalEnemyCount = 0;
-        directionalLight.intensity = 1f;
-        spotlight.intensity = 0f;
-        wave = 1;
-        waveCount.text = "Wave: " + wave.ToString();
-
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
+        currentMines = new GameObject[10];
+        StartWave();
     }
 
     // Update is called once per frame
@@ -70,7 +67,7 @@ public class EnemySpawner : MonoBehaviour
 
     void Spawn ()
     {
-        Debug.Log("Spawner: Spawned Enemy");
+        Debug.Log("\tSpawner: Spawned Enemy");
         int spawnPoint = Random.Range(0, spawnPoints.Length);
         int enemy = Random.Range(0, enemies.Length);
         Instantiate(enemies[enemy], spawnPoints[spawnPoint].position, spawnPoints[spawnPoint].rotation);
@@ -85,13 +82,23 @@ public class EnemySpawner : MonoBehaviour
 
     private void EndWave()
     {
-        Debug.Log("Spawner: Ending Wave");
+        Debug.Log("\tSpawner: Ending Wave");
+        CancelInvoke();
         directionalLight.intensity = 0.2f;
         spotlight.intensity = 1f;
         wave++;
         waveCount.text = "Wave: " + wave.ToString();
 
         player.awardPoints(waveBonus);
+
+        // Get rid of mines
+        for (int i = 0; i < mineNumber; i++)
+        {
+            if (currentMines[i] != null)
+            {
+                Destroy(currentMines[i]);
+            }
+        }
 
         // Spawn in item
         int itemNum = Random.Range(0, items.Length);
@@ -100,23 +107,31 @@ public class EnemySpawner : MonoBehaviour
         // If player ignores item, award bonus points
         if (item.transform.GetChild(0).GetComponent<CollectableHealth>() != null)
         {
-            Debug.Log("Spawner: Spawned Health");
+            Debug.Log("\tSpawner: Spawned Health");
             item.transform.GetChild(0).GetComponent<CollectableHealth>().extraPoints(timeBetweenWaves);
         }
         else if (item.transform.GetChild(0).GetComponent<CollectableAmmo>() != null)
         {
-            Debug.Log("Spawner: Spawned Health");
+            Debug.Log("\tSpawner: Spawned Health");
             item.transform.GetChild(0).GetComponent<CollectableAmmo>().extraPoints(timeBetweenWaves);
         }
     }
 
     private void StartWave()
     {
-        Debug.Log("Spawner: Starting Wave");
+        Debug.Log("\tSpawner: Starting Wave");
         directionalLight.intensity = 1f;
         spotlight.intensity = 0f;
         currentEnemyCount = 0;
         totalEnemyCount = 0;
         state = States.Waiting;
+
+        for (int i = 0; i < mineNumber; i++)
+        {
+            Debug.Log("\tSpawner: Spawned Mine");
+            int mineSpawn = Random.Range(0, mineSpawns.Length);
+            GameObject newMine = Instantiate(mine, mineSpawns[mineSpawn].position, mineSpawns[mineSpawn].rotation);
+            currentMines[i] = newMine;
+        }
     }
 }
