@@ -11,6 +11,7 @@ TagManager:
   - player
   - Fire
   - wp
+  - enemyDamage
   layers:
   - Default
   - TransparentFX

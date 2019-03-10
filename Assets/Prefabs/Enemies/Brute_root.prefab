@@ -800,7 +800,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   aoe: {fileID: 2559235714280879140}
-  enemyHealth: 3
   halo: {fileID: 6163754782827571826}
   waypoints:
   - {fileID: 0}
@@ -808,6 +807,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  maxEnemyHealth: 3
   state: 4
 --- !u!1 &852229072496386323
 GameObject:
@@ -1775,7 +1775,7 @@ GameObject:
   - component: {fileID: 1200009415665947703}
   m_Layer: 10
   m_Name: Sphere
-  m_TagString: brute
+  m_TagString: enemyDamage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -5,18 +5,24 @@ using UnityEngine.AI;
 
 public class BasicEnemyMovement : MonoBehaviour
 {
+    /* Linked objects */
     private PlayerController player;        // Reference to the player.
+    private int playerHealth;
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
     public GameObject aoe;
-    public int enemyHealth = 3;
-    private int playerHealth;
     public Behaviour halo;
-    private int cwp = -1;
+    private Animator anim;
+    private GameObject[] allies;
+    private GameObject closest;
     public GameObject[] waypoints;
     private NavMeshHit ht;
-    private Animator anim;
+
+    /* Stats */
+    public int maxEnemyHealth = 3;          // Maximum allowed health
+    private int enemyHealth = 3;            // Current health
     private float attackTime;
-  
+    private int cwp = -1;
+
     public enum States
     {
         Chase,
@@ -187,9 +193,9 @@ public class BasicEnemyMovement : MonoBehaviour
         }
     }
 
-    public void doubleHealth()
+    public void fullHealth()
     {
-        enemyHealth = enemyHealth + enemyHealth;
+        enemyHealth = maxEnemyHealth;
     }
 
     private void setNextWaypoint()

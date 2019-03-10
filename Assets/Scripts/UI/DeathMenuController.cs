@@ -8,6 +8,7 @@ public class DeathMenuController : MonoBehaviour
     public string mainMenuScene;
     public string arenaScene;
     public GameObject deathMenu;
+    public GameObject pauseMenu;
     public GameObject overlay;
     public bool playerDied;
 
@@ -25,6 +26,9 @@ public class DeathMenuController : MonoBehaviour
             deathMenu.SetActive(true);
             Time.timeScale = 0f;
             overlay.SetActive(false);
+        } else if (!pauseMenu.activeSelf)
+        {
+            Time.timeScale = 1f;
         }
     }
 
@@ -32,6 +36,7 @@ public class DeathMenuController : MonoBehaviour
     {
         Resume();
         SceneManager.LoadScene(arenaScene);
+        Time.timeScale = 1f;
     }
 
     public void Return()

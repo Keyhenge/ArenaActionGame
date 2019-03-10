@@ -69,9 +69,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 409658936}
+  - component: {fileID: 1245257817}
+  - component: {fileID: 1245257818}
   m_Layer: 0
   m_Name: Buffer
-  m_TagString: Untagged
+  m_TagString: buffer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -83,7 +85,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 409658935}
-  m_LocalRotation: {x: -0, y: -0, z: -0.09044727, w: 0.9959012}
+  m_LocalRotation: {x: 0, y: 0, z: -0.09044998, w: 0.99590105}
   m_LocalPosition: {x: 1.1371176, y: 4.33, z: 9.6089115}
   m_LocalScale: {x: 21.242, y: 21.242, z: 21.242}
   m_Children:
@@ -96,6 +98,34 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -10.379001}
+--- !u!122 &1245257817
+Halo:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409658935}
+  m_Enabled: 0
+  m_Color:
+    serializedVersion: 2
+    rgba: 4294912000
+  m_Size: 5
+--- !u!114 &1245257818
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 409658935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8279b5d18efedf846b1fb43323c7821b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  halo: {fileID: 1245257817}
+  maxEnemyHealth: 1
+  setBuffTime: 10
+  state: 0
 --- !u!1 &443828152
 GameObject:
   m_ObjectHideFlags: 0
@@ -291,9 +321,10 @@ GameObject:
   - component: {fileID: 1671905369}
   - component: {fileID: 1671905368}
   - component: {fileID: 654113479355148463}
+  - component: {fileID: 1671905370}
   m_Layer: 0
   m_Name: pCylinder5
-  m_TagString: Untagged
+  m_TagString: enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -371,6 +402,20 @@ CapsuleCollider:
   m_Height: 0.5714772
   m_Direction: 1
   m_Center: {x: -0.000087074935, y: 0.048238784, z: 9.313227e-10}
+--- !u!136 &1671905370
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1671905366}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.06674903
+  m_Height: 0.5965432
+  m_Direction: 1
+  m_Center: {x: -0.000104714425, y: 0.035705652, z: 0}
 --- !u!1 &1676029224
 GameObject:
   m_ObjectHideFlags: 0

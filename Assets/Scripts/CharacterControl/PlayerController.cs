@@ -267,7 +267,7 @@ public class PlayerController : MonoBehaviour
             Vector3 flatCameraRelative = mainCam.transform.TransformDirection(movementXZ);
             flatCameraRelative = new Vector3(flatCameraRelative.x, 0, flatCameraRelative.z);
             flatCameraRelative.Normalize();
-            if (testObject.active)
+            if (testObject.activeSelf)
             {
                 testObject.transform.position = flatCameraRelative * 2 + this.transform.position;
             }
@@ -371,9 +371,13 @@ public class PlayerController : MonoBehaviour
         inAir = true;
     }
 
+
+    //NOTE: MAKE THESE INTO SEPARATE FUNCTIONS LATER
     private void OnTriggerEnter(Collider other)
     {
-        // Hit Brute head
+        Debug.Log(other.transform.gameObject.name);
+        Debug.Log("changedState: " + changedState);
+        // Hit Brute
         if (other.transform.gameObject.name == "Head" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
         {
             Debug.Log("Player: Hit Brute with Sword");
@@ -406,9 +410,81 @@ public class PlayerController : MonoBehaviour
             brute.Hit();
 
             changedState = false;
-        } else if (other.transform.tag == "brute")
+        }
+
+        // Hit Buffer
+        else if (other.transform.gameObject.name == "pCylinder5" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
+        {
+            Debug.Log("Player: Hit Buffer with Sword");
+            // Do a bounce if airborne hit
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeAirAttack, shakeTime);
+                rbody.velocity = Vector3.zero;
+                //rbody.angularVelocity = Vector3.zero;
+                moveHeight = bounceHeight;
+                Bounce(other, 15f, 700f);
+            }
+            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeGroundAttack, shakeTime);
+            }
+
+            // pCylinder5 -> Buffer
+            BufferAI buffer = other.transform.gameObject.
+                transform.parent.gameObject.
+                GetComponent<BufferAI>();
+            if (buffer.getHealth() == 1)
+            {
+                Debug.Log("Player: Killed Buffer");
+                mainCam.GetComponent<CameraController>().shake(shakeKill, shakeTime + 0.1f);
+                score++;
+                spawner.KilledEnemy();
+            }
+            buffer.Hit();
+
+            changedState = false;
+        }
+        else if (other.transform.tag == "enemyDamage")
         {
             TakeDamage();
+        }
+    }
+
+    private void OnTriggerStay(Collider other)
+    {
+        // Hit Buffer
+        if (other.transform.gameObject.name == "pCylinder5" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
+        {
+            Debug.Log("Player: Hit Buffer with Sword");
+            // Do a bounce if airborne hit
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeAirAttack, shakeTime);
+                rbody.velocity = Vector3.zero;
+                //rbody.angularVelocity = Vector3.zero;
+                moveHeight = bounceHeight;
+                Bounce(other, 15f, 700f);
+            }
+            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeGroundAttack, shakeTime);
+            }
+
+            // pCylinder5 -> Buffer
+            BufferAI buffer = other.transform.gameObject.
+                transform.parent.gameObject.
+                GetComponent<BufferAI>();
+            if (buffer.getHealth() == 1)
+            {
+                Debug.Log("Player: Killed Buffer");
+                mainCam.GetComponent<CameraController>().shake(shakeKill, shakeTime + 0.1f);
+                score++;
+                spawner.KilledEnemy();
+            }
+            buffer.Hit();
+
+            changedState = false;
         }
     }
 
@@ -444,6 +520,9 @@ public class PlayerController : MonoBehaviour
         score += points;
     }
 
+    // col:     Collision the bounce is based off of
+    // xzMult:  Multiplier applied to x and z planes
+    // force:   Amount of force applied to player
     private void Bounce(Collision col, float xzMult, float force)
     {
         Vector3 dir = this.transform.position - col.gameObject.transform.position;
