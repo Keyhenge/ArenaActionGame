@@ -5,27 +5,34 @@ using UnityEngine.UI;
 
 public class EnemySpawner : MonoBehaviour
 {
+    /* Enemies */
     public GameObject[] enemies;            // List of enemy prefabs that can be spawned
-    public GameObject[] items;              // List of item prefabs that can be spawned between waves
-    public GameObject mine;                 // Link to landmine prefab
-    public int mineNumber = 1;              // How many mines are spawned per wave
-    private GameObject[] currentMines;      // Links to the mines in the scene already. For right now, must be less than 10
-    public float spawnTime = 5f;            // Time between spawns
+    public float spawnTime = 5f;            // Time between enemy spawns
     public int maxEnemies = 10;             // Max amount of enemies allowed in the scene at once
     public Transform[] spawnPoints;         // Spawn points for enemies
-    public Transform itemSpawn;             // Spawn point for items
-    public Transform[] mineSpawns;          // Spawn points for mines
     public int maxEnemiesPerWave = 20;      // Amount of enemies that will be spawned per wave
     private int currentEnemyCount;          // Amount of enemies currently in the scene
     private int totalEnemyCount;            // Count of total enemies spawned so far this wave
+
+    /* Items */
+    public GameObject[] items;              // List of item prefabs that can be spawned between waves
+    public Transform itemSpawn;             // Spawn point for items
+
+    /* Landmines */
+    public GameObject mine;                 // Link to landmine prefab
+    public int mineNumber = 1;              // How many mines are spawned per wave
+    private GameObject[] currentMines;      // Links to the mines in the scene already. For right now, must be less than 10
+    public Transform[] mineSpawns;          // Spawn points for mines
+
+    /* Wave stats */
     private int wave = 1;                   // Current wave count
     public int waveBonus = 3;               // Bonus to score for completing a wave
     public float timeBetweenWaves = 5f;     // Time between waves in seconds
+    public Text waveCount;                  // Link to UI element describing current wave
 
+    /* Attached Objects */
     public Light directionalLight;          // Link to directional light used at all times
     public Light spotlight;                 // Link to spotlight used during wave interim
-
-    public Text waveCount;                  // Link to UI element describing current wave
     private PlayerController player;        // Link to player
 
     public enum States
