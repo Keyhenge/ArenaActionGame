@@ -1598,7 +1598,7 @@ MonoBehaviour:
   - {fileID: 976765926552587346, guid: d3c7d5132b7c56549ba9658547dbd7bb, type: 3}
   - {fileID: 2749131315225034321, guid: 37e66f2ce7c1e4e4bae02001d1eddb90, type: 3}
   spawnTime: 5
-  maxEnemies: 1
+  maxEnemies: 4
   spawnPoints:
   - {fileID: 1668518783}
   - {fileID: 1495371970}
@@ -1611,7 +1611,7 @@ MonoBehaviour:
   - {fileID: 1622363779}
   - {fileID: 427746928}
   itemSpawn: {fileID: 255588340}
-  maxEnemiesPerWave: 1
+  maxEnemiesPerWave: 10
   waveBonus: 3
   timeBetweenWaves: 5
   directionalLight: {fileID: 170076734}
