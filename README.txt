@@ -27,6 +27,8 @@ Requirements/Notable Features for CS 4455:
 	
 Future plans:
 - Adding in two more enemies (Flyer and Jumping Slime)
+- Adding in two more guns (Shotgun and Cannon)
+- Adding in a dash
 - Texture/Material work on all models
 - Adding more/refinement of animations to achieve better gamefeel and less frustration
 - Particle effects signaling when attacks/actions are about to happen, or have happened
