@@ -8,15 +8,20 @@ public class FlyerAI : MonoBehaviour
 {
     public PlayerController player;        // Reference to the player.
     private NavMeshAgent nav;              // Reference to the nav mesh agent.
-    public int enemyHealth = 3;
+    public int enemyHealth = 1;
     private int playerHealth;
     public Behaviour halo;
     private int cwp = -1;
     public GameObject[] waypoints;
     private NavMeshHit ht;
     //public Animator anim;
-  
-    //public Animator anim;
+
+    //material stuff
+    public Material attackM;
+    public Material chaseM;
+    public Material idleM;
+    public Material deadM;
+
     public enum States
     {
         Chase,
