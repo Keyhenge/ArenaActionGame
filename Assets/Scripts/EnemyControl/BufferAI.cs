@@ -18,6 +18,11 @@ public class BufferAI : MonoBehaviour
     public float setBuffTime = 10;          // Time between buffs
     private float buffTime;                 // Storage for time since last buff
 
+    //material stuff
+    public Material shieldM;
+    public Material idleM;
+    public Material deadM;
+    
     public enum States
     {
         Shield,
