@@ -6,6 +6,7 @@ using UnityEngine.SceneManagement;
 public class MainMenu : MonoBehaviour
 {
     public string startGameScene;
+    public Animator animator;
 
     // Start is called before the first frame update
     void Start()
@@ -21,11 +22,19 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        SceneManager.LoadScene(startGameScene);
+        FadeToLevel();
     }
 
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    public void FadeToLevel() {
+        animator.SetTrigger("FadeOut");
+    }
+
+    public void OnFadeComplete() {
+        SceneManager.LoadScene(startGameScene);
     }
 }

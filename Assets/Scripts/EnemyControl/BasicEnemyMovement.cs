@@ -23,6 +23,12 @@ public class BasicEnemyMovement : MonoBehaviour
     private float attackTime;
     private int cwp = -1;
 
+    //material stuff
+    public Material attackM;
+    public Material chaseM;
+    public Material idleM;
+    public Material deadM;
+
     public enum States
     {
         Chase,
