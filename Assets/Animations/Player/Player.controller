@@ -105,7 +105,7 @@ BlendTree:
     m_DirectBlendParameter: xz-vel
     m_Mirror: 0
   - serializedVersion: 2
-    m_Motion: {fileID: 7400012, guid: 56bf27a1ffa3a034c82808244ea96e6a, type: 3}
+    m_Motion: {fileID: 7400000, guid: c10bcfb8c7399c246b3314a2b1f2c9f1, type: 2}
     m_Threshold: 1
     m_Position: {x: 1, y: 0}
     m_TimeScale: 1
@@ -711,7 +711,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400014, guid: 56bf27a1ffa3a034c82808244ea96e6a, type: 3}
+  m_Motion: {fileID: 7400000, guid: e5ab515ab3ac55b469ceb675f0eb2f49, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
@@ -825,7 +825,7 @@ AnimatorState:
   m_MirrorParameterActive: 0
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
-  m_Motion: {fileID: 7400020, guid: 56bf27a1ffa3a034c82808244ea96e6a, type: 3}
+  m_Motion: {fileID: 7400000, guid: 066aefc7c4a99db4d92041c28839b6fb, type: 2}
   m_Tag: 
   m_SpeedParameter: 
   m_MirrorParameter: 
