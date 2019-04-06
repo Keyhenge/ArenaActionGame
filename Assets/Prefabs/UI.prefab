@@ -1737,8 +1737,8 @@ GameObject:
   - component: {fileID: 8935395763790343395}
   - component: {fileID: 8935395763790343392}
   - component: {fileID: 8935395763790343393}
-  - component: {fileID: 8935395763790343397}
   - component: {fileID: 8935395763790343396}
+  - component: {fileID: 8935395763790343397}
   m_Layer: 5
   m_Name: UI
   m_TagString: Untagged
@@ -1829,6 +1829,24 @@ MonoBehaviour:
   m_BlockingMask:
     serializedVersion: 2
     m_Bits: 4294967295
+--- !u!114 &8935395763790343396
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8935395763790343390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f174c90e523111e498d41f6f317372bb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainMenuScene: Title
+  arenaScene: Arena
+  deathMenu: {fileID: 8935395763616681974}
+  pauseMenu: {fileID: 8935395763415738886}
+  overlay: {fileID: 8935395763339004753}
+  playerDied: 0
 --- !u!114 &8935395763790343397
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1846,20 +1864,3 @@ MonoBehaviour:
   deathMenu: {fileID: 8935395763616681974}
   overlay: {fileID: 8935395763339004753}
   isPaused: 0
---- !u!114 &8935395763790343396
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8935395763790343390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f174c90e523111e498d41f6f317372bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainMenuScene: Title
-  arenaScene: Arena
-  deathMenu: {fileID: 8935395763616681974}
-  overlay: {fileID: 8935395763339004753}
-  playerDied: 0
