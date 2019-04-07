@@ -49,7 +49,7 @@ public class FlyerAI : MonoBehaviour
         nav = this.transform.root.GetComponent<NavMeshAgent>();
         nav.enabled = true;
         anim = GetComponent<Animator>();
-        state = States.Idle;
+        state = States.Chase;
     }
 
     // Update is called once per frame
