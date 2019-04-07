@@ -4417,8 +4417,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1068d8b17798a4d43ad6d72a9c59f0fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 0}
-  enemyHealth: 1
+  aoe: {fileID: 0}
   halo: {fileID: 1773675463}
   waypoints:
   - {fileID: 0}
@@ -4426,6 +4425,11 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  maxEnemyHealth: 3
+  attackM: {fileID: 0}
+  chaseM: {fileID: 0}
+  idleM: {fileID: 0}
+  deadM: {fileID: 0}
   state: 4
 --- !u!195 &1773675458
 NavMeshAgent:
