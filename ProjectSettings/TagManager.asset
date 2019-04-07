@@ -12,6 +12,7 @@ TagManager:
   - Fire
   - wp
   - enemyDamage
+  - flyer
   layers:
   - Default
   - TransparentFX
