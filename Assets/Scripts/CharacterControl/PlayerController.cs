@@ -49,6 +49,7 @@ public class PlayerController : MonoBehaviour
     [Header("UI")]
     public DeathMenuController deathScreen;
     public Text scoreText;
+    public Text scoreText2;
     public Image crosshairs;
     public Text healthText;
     public Text ammoText;
@@ -117,6 +118,7 @@ public class PlayerController : MonoBehaviour
         healthText.text = "Health: " + health;
         ammoText.text = "Ammo: " + ammo;
         scoreText.text = "Score: " + score;
+        scoreText2.text = "Score: " + score;
 
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
@@ -398,8 +400,8 @@ public class PlayerController : MonoBehaviour
     //NOTE: MAKE THESE INTO SEPARATE FUNCTIONS LATER
     private void OnTriggerEnter(Collider other)
     {
-        Debug.Log(other.transform.gameObject.name);
-        Debug.Log("changedState: " + changedState);
+        //Debug.Log(other.transform.gameObject.name);
+        //Debug.Log("changedState: " + changedState);
         // Hit Brute
         if (other.transform.gameObject.name == "Head" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
         {
@@ -469,7 +471,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Hit Flyer
-        else if (other.transform.root.gameObject.name == "Flyer_root" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
+        else if (other.transform.root.transform.GetChild(0).gameObject.name == "Flyer_Anim" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
         {
             Debug.Log("Player: Hit Flyer with Sword");
             // Do a bounce if airborne hit

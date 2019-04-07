@@ -17,8 +17,8 @@ public class EnemySpawner : MonoBehaviour
     public float spawnTime = 5f;            // Time between enemy spawns
     public int maxEnemies = 10;             // Max amount of enemies allowed in the scene at once
     public int maxEnemiesPerWave = 20;      // Amount of enemies that will be spawned per wave
-    private int currentEnemyCount;          // Amount of enemies currently in the scene
-    private int totalEnemyCount;            // Count of total enemies spawned so far this wave
+    public int currentEnemyCount;          // Amount of enemies currently in the scene
+    public int totalEnemyCount;            // Count of total enemies spawned so far this wave
 
     /* Items */
     public GameObject[] items;              // List of item prefabs that can be spawned between waves

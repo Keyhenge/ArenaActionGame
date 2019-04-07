@@ -110,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d388ac3ba9a91646b787a040d426456, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ignoreItemBonus: 3
+  ignoreItemBonus: 10
 --- !u!1 &6668478896052584886
 GameObject:
   m_ObjectHideFlags: 0

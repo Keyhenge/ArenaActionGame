@@ -56,7 +56,6 @@ public class FlyerAI : MonoBehaviour
     void Update()
     {
         playerHealth = player.getHealth();
-        //Debug.Log("playerHealth: " + playerHealth);
         float xzVel = nav.velocity.magnitude;
         anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
 

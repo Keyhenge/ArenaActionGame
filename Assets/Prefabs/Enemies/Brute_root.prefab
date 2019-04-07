@@ -808,6 +808,10 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   maxEnemyHealth: 3
+  attackM: {fileID: 0}
+  chaseM: {fileID: 0}
+  idleM: {fileID: 0}
+  deadM: {fileID: 0}
   state: 4
 --- !u!1 &852229072496386323
 GameObject:
@@ -4587,7 +4591,7 @@ NavMeshAgent:
   m_Enabled: 0
   m_AgentTypeID: -1372625422
   m_Radius: 0.5
-  m_Speed: 3.5
+  m_Speed: 5
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120

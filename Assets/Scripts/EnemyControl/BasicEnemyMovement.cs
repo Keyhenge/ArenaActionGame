@@ -53,12 +53,13 @@ public class BasicEnemyMovement : MonoBehaviour
     void Update()
     {
         playerHealth = player.getHealth();
-        //Debug.Log("playerHealth: " + playerHealth);
+        float xzVel = nav.velocity.magnitude;
+        anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
 
         switch (state)
         {
             case States.Chase:
-                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Walking"))
+                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Walking") || anim.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
                 {
                     chase_player();
                     nav.enabled = true;
