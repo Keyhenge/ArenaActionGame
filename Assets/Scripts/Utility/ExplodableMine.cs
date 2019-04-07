@@ -13,9 +13,10 @@ public class ExplodableMine : MonoBehaviour
 
     private void Update()
     {
-        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Explosion"))
+        AnimatorStateInfo animation = anim.GetCurrentAnimatorStateInfo(0);
+        if (animation.IsName("Explosion"))
         {
-            Destroy(this.transform.root.gameObject, anim.GetCurrentAnimatorStateInfo(0).length);
+            Destroy(this.transform.root.gameObject, animation.length);
         }
     }
 

@@ -5,11 +5,17 @@ using UnityEngine.UI;
 
 public class EnemySpawner : MonoBehaviour
 {
+    /* Arena */
+    public GameObject arena;
+    //private Transform[] spawnPoints;        // Spawn points for enemies
+    //private Transform[] mineSpawns;         // Spawn points for mines
+    private List<Transform> spawnPoints;
+    private List<Transform> mineSpawns;
+
     /* Enemies */
     public GameObject[] enemies;            // List of enemy prefabs that can be spawned
     public float spawnTime = 5f;            // Time between enemy spawns
     public int maxEnemies = 10;             // Max amount of enemies allowed in the scene at once
-    public Transform[] spawnPoints;         // Spawn points for enemies
     public int maxEnemiesPerWave = 20;      // Amount of enemies that will be spawned per wave
     private int currentEnemyCount;          // Amount of enemies currently in the scene
     private int totalEnemyCount;            // Count of total enemies spawned so far this wave
@@ -22,11 +28,10 @@ public class EnemySpawner : MonoBehaviour
     public GameObject mine;                 // Link to landmine prefab
     public int mineNumber = 1;              // How many mines are spawned per wave
     private GameObject[] currentMines;      // Links to the mines in the scene already. For right now, must be less than 10
-    public Transform[] mineSpawns;          // Spawn points for mines
 
     /* Wave stats */
     private int wave = 1;                   // Current wave count
-    public int waveBonus = 3;               // Bonus to score for completing a wave
+    public int waveBonus = 5;               // Bonus to score for completing a wave
     public float timeBetweenWaves = 5f;     // Time between waves in seconds
     public Text waveCount;                  // Link to UI element describing current wave
 
@@ -46,6 +51,19 @@ public class EnemySpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        spawnPoints = new List<Transform>();
+        mineSpawns = new List<Transform>();
+
+        foreach (Transform child in arena.transform.Find("Enemy Spawns"))
+        {
+            spawnPoints.Add(child);
+        }
+
+        foreach (Transform child in arena.transform.Find("Landmine Spawns"))
+        {
+            mineSpawns.Add(child);
+        }
+
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
         currentMines = new GameObject[10];
         StartWave();
@@ -75,7 +93,7 @@ public class EnemySpawner : MonoBehaviour
     void Spawn ()
     {
         Debug.Log("\tSpawner: Spawned Enemy");
-        int spawnPoint = Random.Range(0, spawnPoints.Length);
+        int spawnPoint = Random.Range(0, spawnPoints.Count);
         int enemy = Random.Range(0, enemies.Length);
         Instantiate(enemies[enemy], spawnPoints[spawnPoint].position, spawnPoints[spawnPoint].rotation);
         currentEnemyCount++;
@@ -121,7 +139,7 @@ public class EnemySpawner : MonoBehaviour
         }
         else if (item.transform.GetChild(0).GetComponent<CollectableAmmo>() != null)
         {
-            Debug.Log("\tSpawner: Spawned Health");
+            Debug.Log("\tSpawner: Spawned Ammo");
             item.transform.GetChild(0).GetComponent<CollectableAmmo>().extraPoints(timeBetweenWaves);
         }
     }
@@ -139,7 +157,7 @@ public class EnemySpawner : MonoBehaviour
         for (int i = 0; i < mineNumber; i++)
         {
             Debug.Log("\tSpawner: Spawned Mine");
-            int mineSpawn = Random.Range(0, mineSpawns.Length);
+            int mineSpawn = Random.Range(0, mineSpawns.Count);
             GameObject newMine = Instantiate(mine, mineSpawns[mineSpawn].position, mineSpawns[mineSpawn].rotation);
             currentMines[i] = newMine;
         }

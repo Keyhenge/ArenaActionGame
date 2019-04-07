@@ -282,10 +282,6 @@ public class PlayerController : MonoBehaviour
 
             // Calculate character rotation
             rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
-            if (inAir)
-            {
-                rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
-            }
         }
         else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Fire Rifle"))
         {
@@ -303,7 +299,7 @@ public class PlayerController : MonoBehaviour
 
         //clear for next OnCollisionStay() callback
         moveHeight = 0;
-        inAir = true;
+        //inAir = true;
     }
 
 
@@ -328,15 +324,44 @@ public class PlayerController : MonoBehaviour
             // Brute
             if (enemy.transform.root.GetChild(0).GetComponent<BasicEnemyMovement>() != null)
             {
-                Debug.Log("Player: Hit Brute with Rifle");
                 BasicEnemyMovement brute = enemy.transform.root.GetChild(0).GetComponent<BasicEnemyMovement>();
-                if (brute.getHealth() == 1)
+                if (brute.getHealth() <= 10)
                 {
                     Debug.Log("Player: Killed Brute");
                     score++;
                     spawner.KilledEnemy();
                 }
-                brute.Hit();
+                brute.Hit(10);
+            }
+
+            // Buffer
+            if (enemy.transform.root.GetChild(0).GetComponent<BufferAI>() != null)
+            {
+                BufferAI buffer = enemy.transform.root.GetChild(0).GetComponent<BufferAI>();
+                if (buffer.getHealth() <= 10)
+                {
+                    Debug.Log("Player: Killed Buffer");
+                    score++;
+                    spawner.KilledEnemy();
+                }
+                buffer.Hit(10);
+            }
+
+            Debug.Log("SOMETHING");
+
+
+            // Flyer
+            if (enemy.transform.root.transform.GetChild(0).transform.GetChild(0).GetComponent<FlyerAI>() != null)
+            {
+                
+                FlyerAI flyer = enemy.transform.root.transform.GetChild(0).transform.GetChild(0).GetComponent<FlyerAI>();
+                if (flyer.getHealth() <= 10)
+                {
+                    Debug.Log("Player: Killed Flyer");
+                    score++;
+                    spawner.KilledEnemy();
+                }
+                flyer.Hit(10);
             }
         }
         auxCamTarget.GetComponent<AuxCameraController>().shake(shakeAirAttack / 4f);
@@ -348,7 +373,6 @@ public class PlayerController : MonoBehaviour
     {
         if (collision.transform.gameObject.tag == "ground")
         {
-            //EventManager.TriggerEvent<PlayerLandsEvent, Vector3, float>(collision.contacts[0].point, collision.impulse.magnitude);
             inAir = false;
             moveHeight = 0;
         }
@@ -360,10 +384,9 @@ public class PlayerController : MonoBehaviour
     }
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.transform.gameObject.tag == "ground")
+        if (collision.transform.gameObject.tag == "ground" && inAir)
         {
-            inAir = false;
-            moveHeight = 0;
+            moveHeight = 2;
         }
     }
     private void OnCollisionExit(Collision collision)
@@ -421,7 +444,6 @@ public class PlayerController : MonoBehaviour
             {
                 mainCam.GetComponent<CameraController>().shake(shakeAirAttack, shakeTime);
                 rbody.velocity = Vector3.zero;
-                //rbody.angularVelocity = Vector3.zero;
                 moveHeight = bounceHeight;
                 Bounce(other, 15f, 700f);
             }
@@ -445,6 +467,41 @@ public class PlayerController : MonoBehaviour
 
             changedState = false;
         }
+
+        // Hit Flyer
+        else if (other.transform.root.gameObject.name == "Flyer_root" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
+        {
+            Debug.Log("Player: Hit Flyer with Sword");
+            // Do a bounce if airborne hit
+            if (anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeAirAttack, shakeTime);
+                rbody.velocity = Vector3.zero;
+                moveHeight = bounceHeight;
+                Bounce(other, 15f, 700f);
+            }
+            else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe"))
+            {
+                mainCam.GetComponent<CameraController>().shake(shakeGroundAttack, shakeTime);
+            }
+
+            // something -> Flyer_root -> Flyer_Anim -> Flyer
+            FlyerAI flyer = other.transform.root.
+                transform.GetChild(0).
+                transform.GetChild(0).GetComponent<FlyerAI>();
+            if (flyer.getHealth() == 1)
+            {
+                Debug.Log("Player: Killed Flyer");
+                mainCam.GetComponent<CameraController>().shake(shakeKill, shakeTime + 0.1f);
+                score++;
+                spawner.KilledEnemy();
+            }
+            flyer.Hit();
+
+            changedState = false;
+        }
+
+        // Was hit by enemy
         else if (other.transform.tag == "enemyDamage")
         {
             TakeDamage();

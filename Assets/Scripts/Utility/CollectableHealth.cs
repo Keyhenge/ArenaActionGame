@@ -6,7 +6,7 @@ public class CollectableHealth : MonoBehaviour
 {
     private PlayerController player;
     private Animator anim;
-    public int ignoreItemBonus = 3;
+    public int ignoreItemBonus = 10;
 
     void Awake()
     {

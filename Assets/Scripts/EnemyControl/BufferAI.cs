@@ -146,4 +146,13 @@ public class BufferAI : MonoBehaviour
             Destroy(this.transform.root.gameObject);
         }
     }
+    public void Hit(int damage)
+    {
+        enemyHealth -= damage;
+
+        if (enemyHealth <= 0)
+        {
+            Destroy(this.transform.root.gameObject);
+        }
+    }
 }
