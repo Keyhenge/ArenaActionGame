@@ -22,7 +22,8 @@ public class MainMenu : MonoBehaviour
 
     public void StartGame()
     {
-        FadeToLevel();
+        //FadeToLevel();
+        SceneManager.LoadScene(startGameScene);
     }
 
     public void QuitGame()

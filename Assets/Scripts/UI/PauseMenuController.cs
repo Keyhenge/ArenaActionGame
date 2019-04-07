@@ -14,7 +14,7 @@ public class PauseMenuController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     // Update is called once per frame
@@ -28,7 +28,7 @@ public class PauseMenuController : MonoBehaviour
             }
             else
             {
-                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.lockState = CursorLockMode.None;
                 isPaused = true;
                 pauseMenu.SetActive(true);
                 overlay.SetActive(false);
@@ -39,7 +39,7 @@ public class PauseMenuController : MonoBehaviour
 
     public void Resume()
     {
-        Cursor.lockState = CursorLockMode.None;
+        Cursor.lockState = CursorLockMode.Locked;
         isPaused = false;
         pauseMenu.SetActive(false);
         overlay.SetActive(true);
@@ -49,6 +49,7 @@ public class PauseMenuController : MonoBehaviour
     public void Return()
     {
         Resume();
+        Cursor.lockState = CursorLockMode.None;
         SceneManager.LoadScene(mainMenuScene);
     }
 }
