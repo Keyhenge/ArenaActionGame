@@ -23,6 +23,7 @@ public class EnemySpawner : MonoBehaviour
     /* Items */
     public GameObject[] items;              // List of item prefabs that can be spawned between waves
     public Transform itemSpawn;             // Spawn point for items
+    public GameObject skip;
 
     /* Landmines */
     public GameObject mine;                 // Link to landmine prefab
@@ -111,12 +112,25 @@ public class EnemySpawner : MonoBehaviour
     {
         Debug.Log("\tSpawner: Ending Wave");
         CancelInvoke();
+
+        skip.SetActive(true);
         directionalLight.intensity = 0.2f;
         spotlight.intensity = 1f;
         wave++;
         waveCount.text = "Wave: " + wave.ToString();
 
         player.awardPoints(waveBonus);
+
+        waveBonus++;
+        if (maxEnemies < 10)
+        {
+            maxEnemies++;
+        }
+        maxEnemiesPerWave += 2;
+        if (mineNumber < 10)
+        {
+            mineNumber++;
+        }
 
         // Get rid of mines
         for (int i = 0; i < mineNumber; i++)
@@ -146,6 +160,7 @@ public class EnemySpawner : MonoBehaviour
 
     private void StartWave()
     {
+        skip.SetActive(false);
         Debug.Log("\tSpawner: Starting Wave");
         Debug.Log("\tSpawner: wave: " + wave);
         directionalLight.intensity = 1f;
