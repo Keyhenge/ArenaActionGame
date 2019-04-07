@@ -131,6 +131,10 @@ public class EnemySpawner : MonoBehaviour
         {
             mineNumber++;
         }
+        if (spawnTime > 1f)
+        {
+            spawnTime -= 0.5f;
+        }
 
         // Get rid of mines
         for (int i = 0; i < mineNumber; i++)
