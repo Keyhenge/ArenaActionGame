@@ -23,6 +23,7 @@ public class DeathMenuController : MonoBehaviour
     {
         if (playerDied)
         {
+            Cursor.lockState = CursorLockMode.None;
             deathMenu.SetActive(true);
             Time.timeScale = 0f;
             overlay.SetActive(false);

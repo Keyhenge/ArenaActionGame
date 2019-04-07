@@ -65,7 +65,8 @@ public class FlyerAI : MonoBehaviour
         if (fire)
         {
             //fire = false;
-            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 4 + new Vector3(Random.value, Random.value, Random.value)));
+            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 5 + new Vector3(Random.value, Random.value, Random.value)));
+            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 3 + new Vector3(Random.value, Random.value, Random.value)));
             state = States.Idle;
             attacking = false;
         }
@@ -188,7 +189,7 @@ public class FlyerAI : MonoBehaviour
 
     private void chase_player()
     {
-        NavMesh.FindClosestEdge(player.getPosition(), out ht, NavMesh.AllAreas);
+        NavMesh.FindClosestEdge(player.getPosition() + (this.transform.position - player.getPosition()).normalized * 3, out ht, NavMesh.AllAreas);
         Debug.DrawLine(ht.position, ht.position*1.001f);
 
         nav.SetDestination(ht.position);

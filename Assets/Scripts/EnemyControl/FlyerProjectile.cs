@@ -23,7 +23,7 @@ public class FlyerProjectile : MonoBehaviour
         else
         {
             //this.transform.position = this.transform.position + this.transform.forward * 0.1f;
-            rbody.velocity = this.transform.forward * 15;
+            rbody.velocity = this.transform.forward * 25;
         }
     }
 

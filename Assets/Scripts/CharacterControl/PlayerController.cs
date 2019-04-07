@@ -438,7 +438,7 @@ public class PlayerController : MonoBehaviour
         }
 
         // Hit Buffer
-        else if (other.transform.gameObject.name == "pCylinder5" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
+        else if (other.transform.root.transform.GetChild(0).gameObject.name == "Buffer" && (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe")) && changedState)
         {
             Debug.Log("Player: Hit Buffer with Sword");
             // Do a bounce if airborne hit

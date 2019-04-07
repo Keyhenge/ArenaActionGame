@@ -28,6 +28,7 @@ public class PauseMenuController : MonoBehaviour
             }
             else
             {
+                Cursor.lockState = CursorLockMode.Locked;
                 isPaused = true;
                 pauseMenu.SetActive(true);
                 overlay.SetActive(false);
@@ -38,6 +39,7 @@ public class PauseMenuController : MonoBehaviour
 
     public void Resume()
     {
+        Cursor.lockState = CursorLockMode.None;
         isPaused = false;
         pauseMenu.SetActive(false);
         overlay.SetActive(true);
