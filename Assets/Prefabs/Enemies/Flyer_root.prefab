@@ -563,9 +563,10 @@ GameObject:
   - component: {fileID: 4692851257227446092}
   - component: {fileID: 7397622568280811846}
   - component: {fileID: 4692851257227446082}
+  - component: {fileID: 5931219471356097242}
   m_Layer: 10
   m_Name: Flyer2
-  m_TagString: Untagged
+  m_TagString: flyer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -598,7 +599,7 @@ Halo:
   m_Color:
     serializedVersion: 2
     rgba: 4278190335
-  m_Size: 5
+  m_Size: 2
 --- !u!95 &4692851257227446094
 Animator:
   serializedVersion: 3
@@ -669,6 +670,44 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.015188042
   m_Center: {x: 0, y: -0.023883937, z: 0}
+--- !u!108 &5931219471356097242
+Light:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692851257227446093}
+  m_Enabled: 1
+  serializedVersion: 8
+  m_Type: 2
+  m_Color: {r: 0, g: 1, b: 0.56810045, a: 1}
+  m_Intensity: 100
+  m_Range: 4.6865883
+  m_SpotAngle: 30
+  m_CookieSize: 10
+  m_Shadows:
+    m_Type: 0
+    m_Resolution: -1
+    m_CustomResolution: -1
+    m_Strength: 1
+    m_Bias: 0.05
+    m_NormalBias: 0.4
+    m_NearPlane: 0.2
+  m_Cookie: {fileID: 0}
+  m_DrawHalo: 0
+  m_Flare: {fileID: 0}
+  m_RenderMode: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_Lightmapping: 4
+  m_LightShadowCasterMode: 0
+  m_AreaSize: {x: 1, y: 1}
+  m_BounceIntensity: 1
+  m_ColorTemperature: 6570
+  m_UseColorTemperature: 0
+  m_ShadowRadius: 0
+  m_ShadowAngle: 0
 --- !u!1 &4692851257227446095
 GameObject:
   m_ObjectHideFlags: 0

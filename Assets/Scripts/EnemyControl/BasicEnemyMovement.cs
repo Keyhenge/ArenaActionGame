@@ -16,6 +16,7 @@ public class BasicEnemyMovement : MonoBehaviour
     private GameObject closest;
     public GameObject[] waypoints;
     private NavMeshHit ht;
+    private Light light;
 
     /* Stats */
     public int maxEnemyHealth = 3;          // Maximum allowed health
@@ -47,6 +48,7 @@ public class BasicEnemyMovement : MonoBehaviour
         nav.enabled = true;
         anim = GetComponent<Animator>();
         state = States.Chase;
+        light = GetComponent<Light>();
     }
 
     // Update is called once per frame
@@ -161,6 +163,7 @@ public class BasicEnemyMovement : MonoBehaviour
 
     private void FixedUpdate()
     {
+        light.enabled = false;
         attackTime += 1 * Time.deltaTime;
     }
 
@@ -216,6 +219,7 @@ public class BasicEnemyMovement : MonoBehaviour
     public void fullHealth()
     {
         enemyHealth = maxEnemyHealth;
+        light.enabled = true;
     }
 
     private void setNextWaypoint()

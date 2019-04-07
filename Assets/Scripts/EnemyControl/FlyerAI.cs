@@ -15,6 +15,7 @@ public class FlyerAI : MonoBehaviour
     private int playerHealth;
     private Animator anim;
     private NavMeshHit ht;
+    private Light light;
 
     /* Stats */
     public int maxEnemyHealth = 3;          // Maximum allowed health
@@ -50,6 +51,7 @@ public class FlyerAI : MonoBehaviour
         nav.enabled = true;
         anim = GetComponent<Animator>();
         state = States.Chase;
+        light = GetComponent<Light>();
     }
 
     // Update is called once per frame
@@ -184,6 +186,7 @@ public class FlyerAI : MonoBehaviour
 
     private void FixedUpdate()
     {
+        light.enabled = false;
         attackTime += 1 * Time.deltaTime;
     }
 
@@ -231,6 +234,7 @@ public class FlyerAI : MonoBehaviour
     public void fullHealth()
     {
         enemyHealth = maxEnemyHealth;
+        light.enabled = true;
     }
 
     private void setNextWaypoint()

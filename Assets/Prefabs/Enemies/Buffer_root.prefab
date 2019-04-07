@@ -86,6 +86,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -10.379001
       objectReference: {fileID: 0}
+    - target: {fileID: 1245257817, guid: ff6df7e9f94560442a20ee13a3ca572e, type: 3}
+      propertyPath: m_Color.rgba
+      value: 4288544512
+      objectReference: {fileID: 0}
     - target: {fileID: 1245257818, guid: ff6df7e9f94560442a20ee13a3ca572e, type: 3}
       propertyPath: maxEnemyHealth
       value: 1

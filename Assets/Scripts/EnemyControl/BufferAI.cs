@@ -9,7 +9,7 @@ public class BufferAI : MonoBehaviour
     private PlayerController player;        // Reference to the player.
     public Behaviour halo;
     private Animator anim;
-    private GameObject[] allies;
+    private List<GameObject> allies;
     private GameObject closest;
 
     /* Stats */
@@ -35,17 +35,26 @@ public class BufferAI : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
-        allies = GameObject.FindGameObjectsWithTag("brute");
         anim = GetComponent<Animator>();
         state = States.Idle;
-
-
+        allies = new List<GameObject>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        allies = GameObject.FindGameObjectsWithTag("brute");
+        GameObject[] brutes = GameObject.FindGameObjectsWithTag("brute");
+        for (int i = 0; i < brutes.Length; i++)
+        {
+            allies.Add(brutes[i]);
+        }
+
+        GameObject[] flyers = GameObject.FindGameObjectsWithTag("flyer");
+        for (int i = 0; i < flyers.Length; i++)
+        {
+            allies.Add(flyers[i]);
+        }
+
         switch (state)
         {
             case States.PDead:
@@ -68,11 +77,11 @@ public class BufferAI : MonoBehaviour
                     break;
                 }
 
-                if (allies.Length > 0)
+                if (allies.Count > 0)
                 {
                     //Debug.Log(allies.Length);
                     getClosestAlly();
-                    if (closest.activeSelf && closest.GetComponent<BasicEnemyMovement>().getHealth() > 0 && buffTime >= setBuffTime)
+                    if (closest.activeSelf && buffTime >= setBuffTime)
                     {
                         buffTime = 0;
                         state = States.Shield;
@@ -88,7 +97,15 @@ public class BufferAI : MonoBehaviour
                 {
                     Debug.Log("Buffer: Shielded Ally");
                     halo.enabled = true;
-                    closest.GetComponent<BasicEnemyMovement>().fullHealth();
+                    if (closest.GetComponent<BasicEnemyMovement>() != null)
+                    {
+                        closest.GetComponent<BasicEnemyMovement>().fullHealth();
+                    }
+                    else if (closest.GetComponent<FlyerAI>() != null)
+                    {
+                        closest.GetComponent<FlyerAI>().fullHealth();
+                    }
+                    
                 }
 
                 if (enemyHealth == 0)
@@ -111,6 +128,7 @@ public class BufferAI : MonoBehaviour
                 break;
         }
 
+        allies.Clear();
     }
 
     private void FixedUpdate()
@@ -121,11 +139,41 @@ public class BufferAI : MonoBehaviour
     private void getClosestAlly()
     {
         closest = allies[0];
-        for (int i = 0; i < allies.Length; i++)
+        for (int i = 0; i < allies.Count; i++)
         {
-            if (closest.GetComponent<BasicEnemyMovement>().getHealth() > allies[i].GetComponent<BasicEnemyMovement>().getHealth())
+            if (closest.GetComponent<BasicEnemyMovement>() != null)
             {
-                closest = allies[i];
+                if (allies[i].GetComponent<BasicEnemyMovement>() != null)
+                {
+                    if (closest.GetComponent<BasicEnemyMovement>().getHealth() > allies[i].GetComponent<BasicEnemyMovement>().getHealth())
+                    {
+                        closest = allies[i];
+                    }
+                }
+                else if (allies[i].GetComponent<FlyerAI>() != null)
+                {
+                    if (closest.GetComponent<BasicEnemyMovement>().getHealth() > allies[i].GetComponent<FlyerAI>().getHealth())
+                    {
+                        closest = allies[i];
+                    }
+                }
+            }
+            else if (closest.GetComponent<FlyerAI>() != null)
+            {
+                if (allies[i].GetComponent<BasicEnemyMovement>() != null)
+                {
+                    if (closest.GetComponent<FlyerAI>().getHealth() > allies[i].GetComponent<BasicEnemyMovement>().getHealth())
+                    {
+                        closest = allies[i];
+                    }
+                }
+                else if (allies[i].GetComponent<FlyerAI>() != null)
+                {
+                    if (closest.GetComponent<FlyerAI>().getHealth() > allies[i].GetComponent<FlyerAI>().getHealth())
+                    {
+                        closest = allies[i];
+                    }
+                }
             }
         }
     }
