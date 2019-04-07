@@ -73,7 +73,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -334000983
   m_Radius: 0.5
-  m_Speed: 9
+  m_Speed: 10
   m_Acceleration: 10
   avoidancePriority: 50
   m_AngularSpeed: 200
@@ -636,7 +636,7 @@ MonoBehaviour:
     type: 3}
   maxEnemyHealth: 2
   enemyHealth: 0
-  timeBetweenAttacks: 5
+  timeBetweenAttacks: 3
   fire: 0
   attackM: {fileID: 0}
   chaseM: {fileID: 0}

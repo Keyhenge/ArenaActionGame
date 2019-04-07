@@ -86,18 +86,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -10.379001
       objectReference: {fileID: 0}
-    - target: {fileID: 654113479355148463, guid: ff6df7e9f94560442a20ee13a3ca572e,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 1245257818, guid: ff6df7e9f94560442a20ee13a3ca572e, type: 3}
       propertyPath: maxEnemyHealth
-      value: 3
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1245257818, guid: ff6df7e9f94560442a20ee13a3ca572e, type: 3}
+      propertyPath: setBuffTime
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 1671905370, guid: ff6df7e9f94560442a20ee13a3ca572e, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 654113479355148463, guid: ff6df7e9f94560442a20ee13a3ca572e,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ff6df7e9f94560442a20ee13a3ca572e, type: 3}

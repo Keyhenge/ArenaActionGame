@@ -66,7 +66,7 @@ public class FlyerAI : MonoBehaviour
         {
             //fire = false;
             Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 5 + new Vector3(Random.value, Random.value, Random.value)));
-            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 3 + new Vector3(Random.value, Random.value, Random.value)));
+            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 2 + new Vector3(Random.value, Random.value, Random.value)));
             state = States.Idle;
             attacking = false;
         }

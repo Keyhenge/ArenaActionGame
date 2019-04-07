@@ -198,6 +198,10 @@ public class BasicEnemyMovement : MonoBehaviour
         {
             Destroy(this.transform.root.gameObject);
         }
+        if (state == States.Idle)
+        {
+            state = States.Chase;
+        }
     }
     public void Hit(int damage)
     {
