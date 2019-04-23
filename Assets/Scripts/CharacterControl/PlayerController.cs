@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rbody;                    // Rigidbody reference
     private Animator anim;                      // Animator reference
     private CharacterInputController cinput;    // Input reference 
+    public BoxCollider sword;
 
     [Header("Cameras")]
     public Camera mainCam;                      // Main third-person camera
@@ -134,11 +135,19 @@ public class PlayerController : MonoBehaviour
             inAir = true;
         }
 
+        if (anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe") || anim.GetCurrentAnimatorStateInfo(0).IsName("Air Swipe"))
+        {
+            sword.enabled = true;
+        } else
+        {
+            sword.enabled = false;
+        }
+
         // Event-based inputs need to be handled in Update()
         if (cinput.enabled)
         {
             // Attack
-            if (cinput.Action && anim.GetCurrentAnimatorStateInfo(0).IsName("Ground"))
+            if (cinput.Action && (anim.GetCurrentAnimatorStateInfo(0).IsName("Ground") || anim.GetCurrentAnimatorStateInfo(0).IsName("Swipe Recovery")))
             {
                 Debug.Log("Player: Attack");
                 anim.SetTrigger("attack");
@@ -283,7 +292,7 @@ public class PlayerController : MonoBehaviour
             }
 
             // Calculate character rotation
-            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime);
+            rbody.transform.rotation = Quaternion.RotateTowards(rbody.transform.rotation, Quaternion.LookRotation(flatCameraRelative), maxTurnSpeed * Time.deltaTime * 10);
         }
         else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Aim Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Aiming Rifle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Fire Rifle"))
         {
