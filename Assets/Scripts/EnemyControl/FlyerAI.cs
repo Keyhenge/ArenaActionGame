@@ -196,7 +196,7 @@ public class FlyerAI : MonoBehaviour
 
     private void chase_player()
     {
-        NavMesh.FindClosestEdge(player.getPosition() + (this.transform.position - player.getPosition()).normalized * 3, out ht, NavMesh.AllAreas);
+        NavMesh.FindClosestEdge(player.getPosition() + (this.transform.position - player.getPosition()).normalized * 20, out ht, NavMesh.AllAreas);
         Debug.DrawLine(ht.position, ht.position*1.001f);
 
         nav.SetDestination(ht.position);

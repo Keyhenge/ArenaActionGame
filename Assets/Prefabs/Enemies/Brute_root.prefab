@@ -1817,13 +1817,14 @@ GameObject:
   - component: {fileID: 6631960431571912974}
   - component: {fileID: 41615459333895122}
   - component: {fileID: 1200009415665947703}
+  - component: {fileID: 1796094294930752953}
   m_Layer: 10
   m_Name: Sphere
   m_TagString: enemyDamage
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1637319759471579306
 Transform:
   m_ObjectHideFlags: 0
@@ -1896,6 +1897,25 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!95 &1796094294930752953
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2559235714280879140}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 30ff0d1e7ae93c94585acdea514267d5, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
 --- !u!1 &2559458642623488339
 GameObject:
   m_ObjectHideFlags: 0

@@ -98,10 +98,12 @@ public class BasicEnemyMovement : MonoBehaviour
                 {
                     nav.enabled = false;
                     aoe.SetActive(true);
+                    aoe.GetComponent<Animator>().SetTrigger("attack");
                 }
                 else if (anim.GetCurrentAnimatorStateInfo(0).IsName("AOE Attack"))
                 {
                     anim.ResetTrigger("Attack");
+                    aoe.GetComponent<Animator>().ResetTrigger("attack");
                     nav.enabled = false;
                     aoe.SetActive(false);
                 }

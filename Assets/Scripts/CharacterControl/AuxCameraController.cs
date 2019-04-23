@@ -8,11 +8,12 @@ public class AuxCameraController : MonoBehaviour
     public GameObject player;
     public Material mat;
     private Animator playerAnimator;
+    public GameObject camera;
 
     [Header("Camera Movement")]
     public float xsen = 1.5f;
     public float ysen = 1f;
-    public float distanceToPlayer = 3f;
+    public float distanceToPlayer = 1f;
     private float curX;
     private float curY;
     public float Y_MIN_ANGLE = -25f;
@@ -108,7 +109,7 @@ public class AuxCameraController : MonoBehaviour
 
     private void LateUpdate()
     {
-        //camTransform.position = Vector3.up * 5f + player.transform.position - Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer));
+        camera.transform.position = Vector3.up * 5f + player.transform.position - Quaternion.Euler(curY, curX, 0) * (new Vector3(0, 0, -distanceToPlayer * 0.5f));
         playerAnimator.SetFloat("cameraAngle", curY);
 
         // Camera Shake

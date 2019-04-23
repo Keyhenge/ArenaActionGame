@@ -51,7 +51,7 @@ public class PlayerController : MonoBehaviour
     public DeathMenuController deathScreen;
     public Text scoreText;
     public Text scoreText2;
-    public Image crosshairs;
+    public RawImage crosshairs;
     public Text healthText;
     public Text ammoText;
 
