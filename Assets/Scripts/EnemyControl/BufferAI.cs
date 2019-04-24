@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class BufferAI : MonoBehaviour
 {
@@ -11,6 +12,8 @@ public class BufferAI : MonoBehaviour
     private Animator anim;
     private List<GameObject> allies;
     private GameObject closest;
+    public ParticleSystem particleBuffing;
+    public Slider healthBar;
 
     /* Stats */
     public int maxEnemyHealth = 1;          // Maximum allowed health
@@ -43,6 +46,8 @@ public class BufferAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        healthBar.value = (float)enemyHealth / (float)maxEnemyHealth;
+
         GameObject[] brutes = GameObject.FindGameObjectsWithTag("brute");
         for (int i = 0; i < brutes.Length; i++)
         {
@@ -70,6 +75,10 @@ public class BufferAI : MonoBehaviour
 
             case States.Idle:
                 halo.enabled = false;
+                if (!particleBuffing.isPlaying)
+                {
+                    particleBuffing.Play();
+                }
 
                 if (enemyHealth == 0)
                 {
@@ -93,10 +102,12 @@ public class BufferAI : MonoBehaviour
 
             case States.Shield:
                 //anim.SetTrigger("shield");
+                halo.enabled = true;
+
                 if (closest.activeSelf)
                 {
                     Debug.Log("Buffer: Shielded Ally");
-                    halo.enabled = true;
+                    particleBuffing.Stop();
                     if (closest.GetComponent<BasicEnemyMovement>() != null)
                     {
                         closest.GetComponent<BasicEnemyMovement>().fullHealth();

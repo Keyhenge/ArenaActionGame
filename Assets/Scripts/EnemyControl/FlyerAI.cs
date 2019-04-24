@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class FlyerAI : MonoBehaviour
 {
@@ -16,6 +17,7 @@ public class FlyerAI : MonoBehaviour
     private Animator anim;
     private NavMeshHit ht;
     private Light light;
+    public Slider healthBar;
 
     /* Stats */
     public int maxEnemyHealth = 3;          // Maximum allowed health
@@ -57,6 +59,8 @@ public class FlyerAI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        healthBar.value = (float)enemyHealth / (float)maxEnemyHealth;
+
         playerHealth = player.getHealth();
         float xzVel = nav.velocity.magnitude;
         anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
@@ -192,7 +196,7 @@ public class FlyerAI : MonoBehaviour
 
     private void chase_player()
     {
-        NavMesh.FindClosestEdge(player.getPosition() + (this.transform.position - player.getPosition()).normalized * 3, out ht, NavMesh.AllAreas);
+        NavMesh.FindClosestEdge(player.getPosition() + (this.transform.position - player.getPosition()).normalized * 20, out ht, NavMesh.AllAreas);
         Debug.DrawLine(ht.position, ht.position*1.001f);
 
         nav.SetDestination(ht.position);

@@ -143,10 +143,18 @@ BlendTree:
     m_CycleOffset: 0
     m_DirectBlendParameter: xz-vel
     m_Mirror: 0
+  - serializedVersion: 2
+    m_Motion: {fileID: 7400026, guid: 56bf27a1ffa3a034c82808244ea96e6a, type: 3}
+    m_Threshold: 75
+    m_Position: {x: 0, y: 0}
+    m_TimeScale: 1
+    m_CycleOffset: 0
+    m_DirectBlendParameter: xz-vel
+    m_Mirror: 0
   m_BlendParameter: cameraAngle
   m_BlendParameterY: xz-vel
   m_MinThreshold: -75
-  m_MaxThreshold: 0
+  m_MaxThreshold: 75
   m_UseAutomaticThresholds: 1
   m_NormalizedBlendValues: 0
   m_BlendType: 0
@@ -295,7 +303,7 @@ AnimatorStateTransition:
   m_TransitionDuration: 0.24999999
   m_TransitionOffset: 0
   m_ExitTime: 0.21442004
-  m_HasExitTime: 1
+  m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
   m_OrderedInterruption: 1
