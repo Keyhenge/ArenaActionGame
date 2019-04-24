@@ -927,7 +927,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 6412fc3d848100c499da33874dbf7c38, type: 2}
+  - {fileID: 2100000, guid: 9e52c53a0d29f2c49adf71e8cc6ca46f, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -1184,6 +1184,21 @@ PrefabInstance:
     - target: {fileID: 6494830540692524659, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
       propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.46787477
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.b
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
