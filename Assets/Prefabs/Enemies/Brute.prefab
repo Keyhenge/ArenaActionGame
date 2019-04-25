@@ -4384,7 +4384,7 @@ Halo:
   m_Enabled: 0
   m_Color:
     serializedVersion: 2
-    rgba: 4278190335
+    rgba: 4290773140
   m_Size: 5
 --- !u!95 &1773675461
 Animator:
@@ -4425,6 +4425,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
+  healthBar: {fileID: 0}
   maxEnemyHealth: 3
   attackM: {fileID: 0}
   chaseM: {fileID: 0}

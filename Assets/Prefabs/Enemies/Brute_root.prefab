@@ -1824,7 +1824,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1637319759471579306
 Transform:
   m_ObjectHideFlags: 0
@@ -1864,7 +1864,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 3a1d1f29f58aec44796980d7b71e7790, type: 2}
+  - {fileID: 2100000, guid: 106736db5317249a9bc5273896c6b62e, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5495,6 +5495,21 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0.7263489
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d71ed2a018f94af4f869eb32656e6513, type: 3}
