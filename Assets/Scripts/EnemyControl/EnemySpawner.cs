@@ -172,7 +172,7 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log("\tSpawner: Starting Wave");
         Debug.Log("\tSpawner: wave: " + wave);
 
-        int stageElev = 1;
+        int stageElev = 4;
 
         if (wave > 1) {
             stageElev = Random.Range(1, 4);
