@@ -11,7 +11,7 @@ public class AudioPlay : MonoBehaviour
     }
     
     public void footstep() {
-        sound.PlayOneShot(steps, 0.2f);
+        sound.PlayOneShot(steps, 0.4f);
     }
 
     public void sword() {
