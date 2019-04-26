@@ -18,6 +18,8 @@ public class PlayerController : MonoBehaviour
     private Animator anim;                      // Animator reference
     private CharacterInputController cinput;    // Input reference 
     public BoxCollider sword;
+    public AudioSource audioSource;
+    public AudioClip gunshot;
 
     [Header("Cameras")]
     public Camera mainCam;                      // Main third-person camera
@@ -327,6 +329,7 @@ public class PlayerController : MonoBehaviour
     void FireRifle()
     {
         RaycastHit hit = new RaycastHit();
+        audioSource.PlayOneShot(gunshot, 0.5f);
 
         if (Physics.Raycast(auxCam.transform.position, auxCam.transform.forward, out hit, 10000f, 1 << 10))
         {

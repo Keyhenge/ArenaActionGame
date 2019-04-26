@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class AudioPlay : MonoBehaviour
 {
-    public AudioClip steps, swipe, airSwipe;
+    public AudioClip steps, swipe, airSwipe, rifle;
     public AudioSource sound;
     private void Start() {
         sound.loop = false;
@@ -20,5 +20,9 @@ public class AudioPlay : MonoBehaviour
 
     public void airSword() {
         sound.PlayOneShot(airSwipe);
+    }
+
+    public void shot() {
+        sound.PlayOneShot(rifle);
     }
 }
