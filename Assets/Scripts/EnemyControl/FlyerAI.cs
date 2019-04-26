@@ -182,14 +182,11 @@ public class FlyerAI : MonoBehaviour
         if (rbody.velocity.magnitude < maxSpeed) {
             if (rayInfo.collider) {
                 if (rayInfo.collider.tag == "player") {
-                    Debug.Log("1");
                     rbody.AddForce(ray.direction.normalized * -1);
                 } else {
-                    Debug.Log("2");
                     rbody.AddForce((ray.direction.normalized + new Vector3(0, 10, 0)).normalized * 1.5f);
                 }
             } else {
-                Debug.Log("3");
                 rbody.AddForce(ray.direction.normalized * 2);
             }
         } else {
