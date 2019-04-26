@@ -40,6 +40,7 @@ public class EnemySpawner : MonoBehaviour
     public Light directionalLight;          // Link to directional light used at all times
     public Light spotlight;                 // Link to spotlight used during wave interim
     private PlayerController player;        // Link to player
+    private Animator arenaAnimator;
 
     public enum States
     {
@@ -65,6 +66,7 @@ public class EnemySpawner : MonoBehaviour
             mineSpawns.Add(child);
         }
 
+        arenaAnimator = arena.GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
         currentMines = new GameObject[10];
         StartWave();
@@ -112,6 +114,8 @@ public class EnemySpawner : MonoBehaviour
     {
         Debug.Log("\tSpawner: Ending Wave");
         CancelInvoke();
+
+        arenaAnimator.SetTrigger("elev1");
 
         skip.SetActive(true);
         directionalLight.intensity = 0.2f;
@@ -167,6 +171,23 @@ public class EnemySpawner : MonoBehaviour
         skip.SetActive(false);
         Debug.Log("\tSpawner: Starting Wave");
         Debug.Log("\tSpawner: wave: " + wave);
+
+        int stageElev = 1;
+
+        if (wave > 1) {
+            stageElev = Random.Range(1, 4);
+        }
+
+        if (stageElev == 1) {
+            arenaAnimator.SetTrigger("elev1");
+        } else if (stageElev == 2) {
+            arenaAnimator.SetTrigger("elev2");
+        } else if (stageElev == 3) {
+            arenaAnimator.SetTrigger("elev3");
+        } else if (stageElev == 4) {
+            arenaAnimator.SetTrigger("elev4");
+        }
+
         directionalLight.intensity = 1f;
         spotlight.intensity = 0f;
         currentEnemyCount = 0;

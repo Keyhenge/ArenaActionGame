@@ -77,12 +77,7 @@ public class BasicEnemyMovement : MonoBehaviour
                         state = States.Dead;
                         break;
                     }
-                    if (playerHealth == 0)
-                    {
-                        state = States.PDead;
-                        break;
-                    }
-                    if (Vector3.Distance(this.transform.position, player.getPosition()) <= 20 || attackTime > 10)
+                    if (Vector3.Distance(this.transform.position, player.getPosition()) <= 35 || attackTime > 10)
                     {
                         attackTime = 0;
                         state = States.Attack;
@@ -124,12 +119,6 @@ public class BasicEnemyMovement : MonoBehaviour
                 state = States.Idle;
                 break;
 
-            case States.PDead:
-                halo.enabled = false;
-                nav.enabled = false;
-                //player is dead
-                break;
-
             case States.Dead:
                 nav.enabled = false;
                 halo.enabled = false;
@@ -144,7 +133,10 @@ public class BasicEnemyMovement : MonoBehaviour
                     state = States.Dead;
                     break;
                 }
-                if (!nav.Raycast(player.getPosition(), out ht) && ht.distance < 100)
+
+                Ray ground = new Ray(this.transform.position, player.getPosition() + Vector3.up * 4 - this.transform.position);
+                RaycastHit rayInfo = new RaycastHit();
+                if (Physics.Raycast(ground, out rayInfo, 100))
                 {
                     state = States.Chase;
                 }

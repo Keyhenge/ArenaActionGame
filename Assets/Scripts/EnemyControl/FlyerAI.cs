@@ -83,8 +83,10 @@ public class FlyerAI : MonoBehaviour
         RaycastHit rayInfo = new RaycastHit();
 
         Debug.DrawRay(rbody.transform.position + Vector3.down * 2, (Vector3.down * 10).normalized * 5, Color.magenta);
-        if (Physics.Raycast(ground, out rayInfo, 5) && rayInfo.collider.tag == "ground") {
+        if (Physics.Raycast(ground, out rayInfo, 10) && rayInfo.collider.tag == "ground") {
             flyAboveGround(ground, rayInfo);
+        } else if (!Physics.Raycast(ground, out rayInfo, 20)) {
+            rbody.AddForce(new Vector3(0, -10, 0));
         }
 
         Debug.DrawRay(rbody.transform.position, rbody.velocity.normalized * 5, Color.magenta);
@@ -198,7 +200,7 @@ public class FlyerAI : MonoBehaviour
     }
 
     private void flyAboveGround(Ray ray, RaycastHit rayInfo) {
-        if (rbody.velocity.magnitude < maxSpeed) {
+        if (rayInfo.distance < 5 && rbody.velocity.magnitude < maxSpeed) {
             rbody.AddForce((new Vector3(0, 1, 0) * (1 - rayInfo.distance / 5) * 2).normalized);
         } else {
             rbody.AddForce(rbody.velocity.normalized * -(rbody.velocity.magnitude - maxSpeed));

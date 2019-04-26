@@ -4959,6 +4959,21 @@ PrefabInstance:
       propertyPath: m_AnchorMax.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.r
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.g
+      value: 0.990566
+      objectReference: {fileID: 0}
+    - target: {fileID: 5130962578954629067, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_Color.b
+      value: 0.18749554
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d71ed2a018f94af4f869eb32656e6513, type: 3}
 --- !u!224 &5352436686084520123 stripped
