@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4692851256356884142}
+  - component: {fileID: 607401819431728057}
   m_Layer: 10
   m_Name: Flyer_Anim
   m_TagString: Untagged
@@ -28,9 +29,26 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4692851257227746157}
+  - {fileID: 414390481901712692}
   m_Father: {fileID: 4692851256744777050}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &607401819431728057
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4692851256356884143}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 0
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 80
+  m_CollisionDetection: 0
 --- !u!1 &4692851256744777051
 GameObject:
   m_ObjectHideFlags: 0
@@ -40,7 +58,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4692851256744777050}
-  - component: {fileID: 4692851256744777053}
   m_Layer: 10
   m_Name: Flyer_root
   m_TagString: Untagged
@@ -60,32 +77,9 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4692851256356884142}
-  - {fileID: 414390481901712692}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 135, z: 0}
---- !u!195 &4692851256744777053
-NavMeshAgent:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692851256744777051}
-  m_Enabled: 1
-  m_AgentTypeID: -334000983
-  m_Radius: 0.5
-  m_Speed: 10
-  m_Acceleration: 10
-  avoidancePriority: 50
-  m_AngularSpeed: 200
-  m_StoppingDistance: 1
-  m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
-  m_AutoRepath: 1
-  m_Height: 2
-  m_BaseOffset: 0
-  m_WalkableMask: 4294967295
-  m_ObstacleAvoidanceType: 4
 --- !u!1 &4692851257227446081
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,7 +557,6 @@ GameObject:
   - component: {fileID: 4692851257227446094}
   - component: {fileID: 4692851257227446092}
   - component: {fileID: 7397622568280811846}
-  - component: {fileID: 4692851257227446082}
   - component: {fileID: 5931219471356097242}
   m_Layer: 10
   m_Name: Flyer2
@@ -641,25 +634,14 @@ MonoBehaviour:
   enemyHealth: 0
   timeBetweenAttacks: 3
   fire: 0
+  maxSpeed: 10
+  vel: 0
   attackM: {fileID: 0}
   chaseM: {fileID: 0}
   idleM: {fileID: 0}
   deadM: {fileID: 0}
   state: 0
 --- !u!135 &7397622568280811846
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4692851257227446093}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.015188042
-  m_Center: {x: 0, y: -0.023883937, z: 0}
---- !u!135 &4692851257227446082
 SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -679,7 +661,7 @@ Light:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4692851257227446093}
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 8
   m_Type: 2
   m_Color: {r: 0, g: 1, b: 0.56810045, a: 1}
@@ -1059,7 +1041,7 @@ PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Modification:
-    m_TransformParent: {fileID: 4692851256744777050}
+    m_TransformParent: {fileID: 4692851256356884142}
     m_Modifications:
     - target: {fileID: 1596849447909557837, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
@@ -1079,7 +1061,7 @@ PrefabInstance:
     - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
@@ -1124,12 +1106,12 @@ PrefabInstance:
     - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.06
+      value: 0.059998117
       objectReference: {fileID: 0}
     - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 7.43
+      value: 0.35000038
       objectReference: {fileID: 0}
     - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
@@ -1174,7 +1156,17 @@ PrefabInstance:
     - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}
       propertyPath: m_LocalScale.x
-      value: 0.008334834
+      value: 0.008334846
+      objectReference: {fileID: 0}
+    - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.016144019
+      objectReference: {fileID: 0}
+    - target: {fileID: 9113644491254976113, guid: d71ed2a018f94af4f869eb32656e6513,
+        type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.016144043
       objectReference: {fileID: 0}
     - target: {fileID: 6494830540692524659, guid: d71ed2a018f94af4f869eb32656e6513,
         type: 3}

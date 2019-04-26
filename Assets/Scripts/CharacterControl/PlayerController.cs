@@ -93,6 +93,7 @@ public class PlayerController : MonoBehaviour
 
     void Start()
     {
+        health = maxHealth;
         anim.applyRootMotion = false;
         inAir = true;
 
@@ -124,7 +125,7 @@ public class PlayerController : MonoBehaviour
         //onCollisionStay() doesn't always work for checking if the character is grounded from a playability perspective
         //Uneven terrain can cause the player to become technically airborne, but so close the player thinks they're touching ground.
         //Therefore, an additional raycast approach is used to check for close ground
-        if (CharacterCommon.CheckGroundNear(this.transform.position, 0.1f, 1f, out closeToJumpableGround))
+        if (CharacterCommon.CheckGroundNear(this.transform.position, 0.5f, 1f, out closeToJumpableGround))
         {
             inAir = false;
             airAttack = true;
@@ -395,10 +396,10 @@ public class PlayerController : MonoBehaviour
     }
     private void OnCollisionStay(Collision collision)
     {
-        if (collision.transform.gameObject.tag == "ground" && inAir)
+        /*if (collision.transform.gameObject.tag == "ground" && inAir)
         {
             moveHeight = 2;
-        }
+        }*/
     }
     private void OnCollisionExit(Collision collision)
     {

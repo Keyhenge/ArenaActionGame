@@ -11,13 +11,14 @@ public class FlyerAI : MonoBehaviour
     public GameObject[] waypoints;
     public GameObject projectile;
 
-    private NavMeshAgent nav;              // Reference to the nav mesh agent.
+    //private NavMeshAgent nav;              // Reference to the nav mesh agent.
     private PlayerController player;        // Reference to the player.
     private int playerHealth;
     private Animator anim;
-    private NavMeshHit ht;
+    //private NavMeshHit ht;
     private Light light;
     public Slider healthBar;
+    private Rigidbody rbody;
 
     /* Stats */
     public int maxEnemyHealth = 3;          // Maximum allowed health
@@ -27,6 +28,8 @@ public class FlyerAI : MonoBehaviour
     public float timeBetweenAttacks = 5f;
     public bool fire = false;               // Animated variable; when true, spawns a projectile
     private bool attacking = false;
+    public float maxSpeed = 10f;
+    public float vel = 0;
 
     //material stuff
     public Material attackM;
@@ -34,8 +37,7 @@ public class FlyerAI : MonoBehaviour
     public Material idleM;
     public Material deadM;
 
-    public enum States
-    {
+    public enum States {
         Chase,
         Attack,
         PDead,
@@ -44,139 +46,126 @@ public class FlyerAI : MonoBehaviour
     };
     public States state;
 
-    void Start()
-    {
+    void Start() {
         enemyHealth = maxEnemyHealth;
         waypoints = GameObject.FindGameObjectsWithTag("wp");
         player = GameObject.FindGameObjectWithTag("player").GetComponent<PlayerController>();
-        nav = this.transform.root.GetComponent<NavMeshAgent>();
-        nav.enabled = true;
+        rbody = this.transform.root.GetChild(0).GetComponent<Rigidbody>();
         anim = GetComponent<Animator>();
         state = States.Chase;
         light = GetComponent<Light>();
     }
 
     // Update is called once per frame
-    void Update()
-    {
+    void Update() {
         healthBar.value = (float)enemyHealth / (float)maxEnemyHealth;
 
         playerHealth = player.getHealth();
-        float xzVel = nav.velocity.magnitude;
-        anim.SetFloat("xz-vel", xzVel, 1f, Time.deltaTime * 10f);
+        float vel = rbody.velocity.magnitude;
+        anim.SetFloat("vel", vel, 1f, Time.deltaTime * 10f);
+    }
 
-        Ray ray = new Ray(this.transform.position, player.getPosition() + Vector3.up * 4 - this.transform.position);
-        RaycastHit rayInfo = new RaycastHit();
+    private void FixedUpdate() {
+        light.enabled = false;
+        attackTime += 1 * Time.deltaTime;
 
-        if (fire)
-        {
+        if (fire) {
             //fire = false;
-            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 5 + new Vector3(Random.value, Random.value, Random.value)));
-            Instantiate(projectile, this.transform.position, Quaternion.LookRotation((player.getPosition() - this.transform.position).normalized * 2 + new Vector3(Random.value, Random.value, Random.value)));
+            Instantiate(projectile, rbody.transform.position, Quaternion.LookRotation(rbody.transform.forward * 5 + new Vector3(Random.value, Random.value, Random.value)));
+            Instantiate(projectile, rbody.transform.position, Quaternion.LookRotation(rbody.transform.forward * 2 + new Vector3(Random.value, Random.value, Random.value)));
             state = States.Idle;
             attacking = false;
         }
 
-        switch (state)
-        {
+        Ray currentDirection = new Ray(rbody.transform.position, rbody.velocity);
+        Ray ray = new Ray(rbody.transform.position, player.getPosition() + Vector3.up * 4 - rbody.transform.position);
+        Ray ground = new Ray(rbody.transform.position + Vector3.down * 2, Vector3.down * 10);
+        RaycastHit rayInfo = new RaycastHit();
+
+        Debug.DrawRay(rbody.transform.position + Vector3.down * 2, (Vector3.down * 10).normalized * 5, Color.magenta);
+        if (Physics.Raycast(ground, out rayInfo, 5) && rayInfo.collider.tag == "ground") {
+            flyAboveGround(ground, rayInfo);
+        }
+
+        Debug.DrawRay(rbody.transform.position, rbody.velocity.normalized * 5, Color.magenta);
+        if (Physics.Raycast(currentDirection, out rayInfo, 5)) {
+            avoidBumping(currentDirection, rayInfo);
+        }
+
+        switch (state) {
             case States.Chase:
-                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Idle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Flying"))
-                {
-                    chase_player();
-                    nav.enabled = true;
+                if (anim.GetCurrentAnimatorStateInfo(0).IsName("Idle") || anim.GetCurrentAnimatorStateInfo(0).IsName("Flying")) {
+                    Physics.Raycast(ray, out rayInfo, 10);
+                    Debug.DrawRay(rbody.transform.position, (player.getPosition() + Vector3.up * 4 - rbody.transform.position).normalized * 10, Color.magenta);
+                    chasePlayer(ray, rayInfo);
                     halo.enabled = false;
-                    if (enemyHealth == 0)
-                    {
+                    if (enemyHealth == 0) {
                         state = States.Dead;
                         break;
                     }
-                    if (playerHealth == 0)
-                    {
-                        state = States.PDead;
-                        break;
-                    }
 
-                    if (attackTime > timeBetweenAttacks)
-                    {
-                        Debug.DrawRay(this.transform.position, (player.getPosition() + Vector3.up * 4 - this.transform.position).normalized * 70, Color.red);
-                        if (Physics.Raycast(ray, out rayInfo, 70))
-                        {
-                            if (rayInfo.collider.tag == "player")
-                            {
+                    if (attackTime > timeBetweenAttacks) {
+                        Debug.DrawRay(rbody.transform.position, (player.getPosition() + Vector3.up * 4 - rbody.transform.position).normalized * 50, Color.red);
+                        if (Physics.Raycast(ray, out rayInfo, 50)) {
+                            if (rayInfo.collider.tag == "player") {
                                 state = States.Attack;
                                 break;
                             }
-                            else
-                            {
-                                state = States.Idle;
-                            }
                         }
-                    }
-                    else
-                    {
-                        Debug.DrawRay(this.transform.position, (player.getPosition() + Vector3.up * 4 - this.transform.position).normalized * 70, Color.green);
+                    } else {
+                        Debug.DrawRay(rbody.transform.position, (player.getPosition() + Vector3.up * 4 - rbody.transform.position).normalized * 70, Color.green);
                     }
 
-                    /*if (nav.Raycast(player.getPosition(), out ht))
-                    {
-                        state = States.Idle;
-                    }*/
-                }
-                else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
-                {
+                    if (Physics.Raycast(ray, out rayInfo, 50)) {
+                        if (rayInfo.collider.tag == "player" && rayInfo.distance > 5) {
+                            rbody.rotation = Quaternion.Slerp(rbody.transform.rotation, Quaternion.LookRotation(player.getPosition() - this.transform.position), 2 * Time.deltaTime);
+                        }
+                    }
+                } else if (anim.GetCurrentAnimatorStateInfo(0).IsName("Attack")) {
                     anim.ResetTrigger("attack");
-                    nav.enabled = false;
                 }
+                
+
                 break;
 
             case States.Attack:
-                if (!attacking)
-                {
-                    attack();
+                Physics.Raycast(ray, out rayInfo, 10);
+                Debug.DrawRay(rbody.transform.position, (player.getPosition() + Vector3.up * 4 - rbody.transform.position).normalized * 10, Color.magenta);
+                chasePlayer(ray, rayInfo);
+
+                if (Physics.Raycast(ray, out rayInfo, 50)) {
+                    if (rayInfo.collider.tag == "player" && rayInfo.distance > 8) {
+                        rbody.rotation = Quaternion.Slerp(rbody.transform.rotation, Quaternion.LookRotation(player.getPosition() - this.transform.position), Time.deltaTime);
+                    }
                 }
-                else
-                {
-                    nav.transform.rotation = Quaternion.Slerp(nav.transform.rotation, Quaternion.LookRotation(player.getPosition() - this.transform.position), 300 * Time.deltaTime);
+
+                if (!attacking) {
+                    attack();
+                } else {
+                    //nav.transform.rotation = Quaternion.Slerp(nav.transform.rotation, Quaternion.LookRotation(player.getPosition() - this.transform.position), 300 * Time.deltaTime);
                 }
                 attacking = true;
                 break;
 
-            case States.PDead:
-                halo.enabled = false;
-                nav.enabled = false;
-                //player is dead
-                break;
-
             case States.Dead:
-                nav.enabled = false;
                 halo.enabled = false;
                 // need to figure out what we want to do when enemy is dead
                 //ie death animation, deletion, etc. 
                 break;
 
             case States.Idle:
+                rest();
                 halo.enabled = false;
                 attackTime = 0;
 
-                if (enemyHealth == 0)
-                {
+                if (enemyHealth == 0) {
                     state = States.Dead;
                     break;
                 }
 
-                Debug.DrawRay(this.transform.position, (player.getPosition() + Vector3.up * 4 - this.transform.position).normalized * 70, Color.blue);
-                if (Physics.Raycast(ray, out rayInfo, 70) && rayInfo.collider.tag == "player")
-                {
+                Debug.DrawRay(rbody.transform.position, (player.getPosition() + Vector3.up * 4 - rbody.transform.position).normalized * 70, Color.blue);
+                if (Physics.Raycast(ray, out rayInfo, 70) && rayInfo.collider.tag == "player") {
                     state = States.Chase;
-                }
-                else
-                {
-                    //getWP();
-                    if (nav.pathPending == false && nav.remainingDistance <= 2)
-                    {
-                        setNextWaypoint();
-                    }
-                    // setNextWaypoint();
                 }
                 break;
 
@@ -185,25 +174,46 @@ public class FlyerAI : MonoBehaviour
                 state = States.Idle;
                 break;
         }
-
     }
 
-    private void FixedUpdate()
-    {
-        light.enabled = false;
-        attackTime += 1 * Time.deltaTime;
+    private void chasePlayer(Ray ray, RaycastHit rayInfo) {
+        if (rbody.velocity.magnitude < maxSpeed) {
+            if (rayInfo.collider) {
+                if (rayInfo.collider.tag == "player") {
+                    Debug.Log("1");
+                    rbody.AddForce(ray.direction.normalized * -1);
+                } else {
+                    Debug.Log("2");
+                    rbody.AddForce((ray.direction.normalized + new Vector3(0, 10, 0)).normalized * 1.5f);
+                }
+            } else {
+                Debug.Log("3");
+                rbody.AddForce(ray.direction.normalized * 2);
+            }
+        } else {
+            rbody.AddForce(rbody.velocity.normalized * -(rbody.velocity.magnitude - maxSpeed));
+        }
+
+        vel = rbody.velocity.magnitude;
     }
 
-    private void chase_player()
-    {
-        NavMesh.FindClosestEdge(player.getPosition() + (this.transform.position - player.getPosition()).normalized * 20, out ht, NavMesh.AllAreas);
-        Debug.DrawLine(ht.position, ht.position*1.001f);
-
-        nav.SetDestination(ht.position);
+    private void flyAboveGround(Ray ray, RaycastHit rayInfo) {
+        if (rbody.velocity.magnitude < maxSpeed) {
+            rbody.AddForce((new Vector3(0, 1, 0) * (1 - rayInfo.distance / 5) * 2).normalized);
+        } else {
+            rbody.AddForce(rbody.velocity.normalized * -(rbody.velocity.magnitude - maxSpeed));
+        }
     }
 
-    private void attack()
-    {
+    private void avoidBumping(Ray ray, RaycastHit rayInfo) {
+        rbody.AddForce(rbody.velocity.normalized * -(10-rayInfo.distance));
+    }
+
+    private void rest() {
+        rbody.AddForce(rbody.velocity.normalized * -1);
+    }
+
+    private void attack() {
         //add attack funtionality when animation and stuff is done
         attackTime = 0;
         halo.enabled = true;
@@ -211,48 +221,38 @@ public class FlyerAI : MonoBehaviour
     }
 
     /* Health-related methods */
-    public int getHealth()
-    {
+    public int getHealth() {
         return enemyHealth;
     }
 
-    public void Hit()
-    {
+    public void Hit() {
         enemyHealth -= 1;
 
-        if (enemyHealth <= 0)
-        {
+        if (enemyHealth <= 0) {
             Destroy(this.transform.root.gameObject);
         }
     }
-    public void Hit(int damage)
-    {
+    public void Hit(int damage) {
         enemyHealth -= damage;
 
-        if (enemyHealth <= 0)
-        {
+        if (enemyHealth <= 0) {
             Destroy(this.transform.root.gameObject);
         }
     }
 
-    public void fullHealth()
-    {
+    public void fullHealth() {
         enemyHealth = maxEnemyHealth;
         light.enabled = true;
     }
 
-    private void setNextWaypoint()
-    {
-        if (waypoints.Length == 0)
-        {
+    /*private void setNextWaypoint() {
+        if (waypoints.Length == 0) {
             return;
         }
-        if (waypoints.Length - 1 == cwp)
-        {
+
+        if (waypoints.Length - 1 == cwp) {
             cwp = 0;
-        }
-        else
-        {
+        } else {
             cwp = cwp + 1;
         }
 
@@ -270,5 +270,5 @@ public class FlyerAI : MonoBehaviour
             }
         }
 
-    }
+    }*/
 }
